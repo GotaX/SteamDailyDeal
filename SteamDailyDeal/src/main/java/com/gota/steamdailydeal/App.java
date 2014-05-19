@@ -22,6 +22,7 @@ import com.gota.steamdailydeal.gson.FeaturedCategoriesDeserializer;
 import com.gota.steamdailydeal.volley.BitmapCache;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Gota on 2014/5/18.
@@ -52,9 +53,18 @@ public class App extends Application {
 
     public Calendar getUpdateCalendar() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, prefs.getInt(Pref.REFRESH_HOUER, 1));
-        calendar.set(Calendar.MINUTE, prefs.getInt(Pref.REFRESH_MINITUE, 0));
+
+        int hourOfDay = prefs.getInt(Pref.REFRESH_HOUER, 1);
+        int minute = prefs.getInt(Pref.REFRESH_MINITUE, 0);
+
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
+
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            int oneDayInMillisecond = (int) TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
+            calendar.add(Calendar.MILLISECOND, oneDayInMillisecond);
+        }
         return calendar;
     }
 
@@ -89,6 +99,7 @@ public class App extends Application {
         updateIntent.setAction(DailyDealWidget.ACTION_REFRESH);
         updateIntent.putExtra(DailyDealWidget.KEY_NEED_RETRY, true);
         updateIntent.putExtra(DailyDealWidget.KEY_FORCE_REFRESH, false);
+        updateIntent.putExtra("alarm", true);
         return PendingIntent.getBroadcast(this, 1, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 

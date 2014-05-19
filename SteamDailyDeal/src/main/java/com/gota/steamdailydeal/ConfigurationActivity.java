@@ -13,6 +13,8 @@ import com.gota.steamdailydeal.constants.Pref;
 
 public class ConfigurationActivity extends ActionBarActivity {
 
+    public static final String TAG = "configuration";
+
     TimePicker tp;
 
     private int mAppWidgetId;
@@ -20,7 +22,7 @@ public class ConfigurationActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(App.TAG, "on configuration activity created");
+        Log.d(TAG, "on configuration activity created");
         setContentView(R.layout.activity_configuration);
 
         tp = (TimePicker) findViewById(R.id.tp_refresh_time);
@@ -39,8 +41,10 @@ public class ConfigurationActivity extends ActionBarActivity {
             .putInt(Pref.REFRESH_MINITUE, minute)
             .commit();
 
+        Log.d(TAG, "Setup alarm");
         App.instance.setupAlarm();
 
+        Log.d(TAG, "Send refresh broadcast");
         Intent refreshIntent = new Intent(this, DailyDealWidget.class);
         refreshIntent.setAction(DailyDealWidget.ACTION_REFRESH);
         refreshIntent.putExtra(DailyDealWidget.KEY_WIDGET_ID, mAppWidgetId);
@@ -48,6 +52,7 @@ public class ConfigurationActivity extends ActionBarActivity {
         refreshIntent.putExtra(DailyDealWidget.KEY_FORCE_REFRESH, true);
         sendBroadcast(refreshIntent);
 
+        Log.d(TAG, "Finish");
         Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         setResult(RESULT_OK, resultValue);

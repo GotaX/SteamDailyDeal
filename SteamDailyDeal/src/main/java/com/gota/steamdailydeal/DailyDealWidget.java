@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -48,7 +47,8 @@ public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTas
             int widgetId = intent.getIntExtra(KEY_WIDGET_ID, 0);
             boolean needRetry = intent.getBooleanExtra(KEY_NEED_RETRY, false);
             boolean forceRefresh = intent.getBooleanExtra(KEY_FORCE_REFRESH, false);
-            Log.d(App.TAG, String.format("receive: needRetry= %s, forceRefresh=%s", needRetry, forceRefresh));
+            boolean alarm = intent.getBooleanExtra("alarm", false);
+            Log.d(App.TAG, String.format("receive: needRetry= %s, forceRefresh=%s, alarm=%s", needRetry, forceRefresh, alarm));
             startUpdate(widgetId, needRetry, forceRefresh);
         } else {
             super.onReceive(context, intent);
