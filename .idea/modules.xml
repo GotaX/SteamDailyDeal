@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SteamDailyDeal.iml" filepath="$PROJECT_DIR$/SteamDailyDeal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SteamDailyDeal/SteamDailyDeal-SteamDailyDeal.iml" filepath="$PROJECT_DIR$/SteamDailyDeal/SteamDailyDeal-SteamDailyDeal.iml" />
+    </modules>
+  </component>
+</project>
+
