@@ -1,4 +1,4 @@
-package com.gota.steamdailydeal;
+package com.gota.steamdailydeal.constants;
 
 /**
  * Created by Gota on 2014/5/18.

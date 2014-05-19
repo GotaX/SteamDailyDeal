@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.gota.steamdailydeal.api.Steam;
+import com.gota.steamdailydeal.constants.Steam;
 import com.gota.steamdailydeal.entity.AppInfo;
 import com.gota.steamdailydeal.exception.NoNetworkException;
 import com.gota.steamdailydeal.util.MyTextUtils;

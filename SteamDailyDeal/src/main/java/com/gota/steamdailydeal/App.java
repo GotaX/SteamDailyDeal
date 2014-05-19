@@ -16,6 +16,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.gota.steamdailydeal.constants.Pref;
 import com.gota.steamdailydeal.entity.FeaturedCategories;
 import com.gota.steamdailydeal.gson.FeaturedCategoriesDeserializer;
 import com.gota.steamdailydeal.volley.BitmapCache;

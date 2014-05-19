@@ -2,10 +2,12 @@ package com.gota.steamdailydeal;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.TimePicker;
+
+import com.gota.steamdailydeal.constants.Pref;
 
 
 public class ConfigurationActivity extends ActionBarActivity {
