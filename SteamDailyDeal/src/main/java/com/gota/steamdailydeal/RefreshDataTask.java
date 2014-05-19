@@ -51,37 +51,42 @@ public class RefreshDataTask {
     }
 
     private void requestData() {
-        App.queue.add(new GsonRequest<>(
-                Request.Method.GET,
-                FeaturedCategories.class,
-                StorefrontAPI.FEATURED_CATEGORIES,
-                null,
-                new Response.Listener<FeaturedCategories>() {
-                    @Override
-                    public void onResponse(FeaturedCategories featuredCategories) {
-                        CategoryInfo catDailyDeal = featuredCategories.getDailyDeal();
-                        AppInfo app = catDailyDeal == null ? null : catDailyDeal.items.get(0);
-                        if (mForceRefresh || app == null || updateRefreshInfo(app)) {
-                            mListener.onUpdateUI(mViews, mWidgetId, app);
-                        } else if (mRetryCount < mRetryTime) {
-                            Log.d(App.TAG, "Retry " + mRetryCount);
-                            try {
-                                int sleepTime = mRetryCount * 2 + 1;
-                                mRetryCount++;
-                                TimeUnit.MINUTES.sleep(sleepTime);
-                                requestData();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        new Thread(new Runnable() {
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Log.e(App.TAG, "", volleyError);
+            public void run() {
+                App.queue.add(new GsonRequest<>(
+                        Request.Method.GET,
+                        FeaturedCategories.class,
+                        StorefrontAPI.FEATURED_CATEGORIES,
+                        null,
+                        new Response.Listener<FeaturedCategories>() {
+                            @Override
+                            public void onResponse(FeaturedCategories featuredCategories) {
+                                CategoryInfo catDailyDeal = featuredCategories.getDailyDeal();
+                                AppInfo app = catDailyDeal == null ? null : catDailyDeal.items.get(0);
+                                if (mForceRefresh || app == null || updateRefreshInfo(app)) {
+                                    mListener.onUpdateUI(mViews, mWidgetId, app);
+                                } else if (mRetryCount < mRetryTime) {
+                                    Log.d(App.TAG, "Retry " + mRetryCount);
+                                    try {
+                                        int sleepTime = mRetryCount * 2 + 1;
+                                        mRetryCount++;
+                                        TimeUnit.MINUTES.sleep(sleepTime);
+                                        requestData();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.e(App.TAG, "", volleyError);
+                    }
+                }));
+                App.queue.start();
             }
-        }));
-        App.queue.start();
+        }).start();
     }
 
     public boolean isNeedToUpdate() {

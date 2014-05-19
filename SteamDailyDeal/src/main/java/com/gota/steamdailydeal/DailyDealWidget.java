@@ -19,6 +19,8 @@ import com.gota.steamdailydeal.entity.AppInfo;
 import com.gota.steamdailydeal.exception.NoNetworkException;
 import com.gota.steamdailydeal.util.MyTextUtils;
 
+import java.util.Arrays;
+
 
 /**
  * Implementation of App Widget functionality.
@@ -55,7 +57,7 @@ public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTas
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d(App.TAG, "on update");
+        Log.d(App.TAG, "on update: " + Arrays.toString(appWidgetIds));
         for (int appWidgetId : appWidgetIds) {
             startUpdate(appWidgetId, false, false);
         }

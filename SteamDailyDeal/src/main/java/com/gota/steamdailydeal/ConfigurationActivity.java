@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 
@@ -19,6 +20,7 @@ public class ConfigurationActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(App.TAG, "on configuration activity created");
         setContentView(R.layout.activity_configuration);
 
         tp = (TimePicker) findViewById(R.id.tp_refresh_time);
