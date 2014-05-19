@@ -6,7 +6,9 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -83,22 +85,29 @@ public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTas
 
     @Override
     public void onUpdateUI(RemoteViews views, int widgetId, AppInfo app) {
-        String discountPercent = String.format("-%s%s", app.discountPercent, "%");
-        views.setTextViewText(R.id.tv_discount_percent, discountPercent);
+        if (app == null) {
+            views.setViewVisibility(R.id.area_price, View.INVISIBLE);
+            views.setViewVisibility(R.id.tv_name, View.INVISIBLE);
+            views.setImageViewResource(R.id.img_header, R.drawable.no_daily_deal);
+            mAppWidgetManager.updateAppWidget(widgetId, views);
+        } else {
+            String discountPercent = String.format("-%s%s", app.discountPercent, "%");
+            views.setTextViewText(R.id.tv_discount_percent, discountPercent);
 
-        String originalPrice = String.format("$%s", app.originalPrice / 100f);
-        views.setTextViewText(R.id.tv_original_price, MyTextUtils.strikethrough(originalPrice));
+            String originalPrice = String.format("$%s", app.originalPrice / 100f);
+            views.setTextViewText(R.id.tv_original_price, MyTextUtils.strikethrough(originalPrice));
 
-        String price = String.format("$%s %s", app.finalPrice / 100f, app.currency);
-        views.setTextViewText(R.id.tv_price, price);
+            String price = String.format("$%s %s", app.finalPrice / 100f, app.currency);
+            views.setTextViewText(R.id.tv_price, price);
 
-        views.setTextViewText(R.id.tv_name, app.name);
-        initOnClickUrl(views, app.id);
+            views.setTextViewText(R.id.tv_name, app.name);
+            initOnClickUrl(views, app.id);
 
-        views.setImageViewResource(R.id.img_header, R.drawable.loading);
-        mAppWidgetManager.updateAppWidget(widgetId, views);
+            views.setImageViewResource(R.id.img_header, R.drawable.loading);
+            mAppWidgetManager.updateAppWidget(widgetId, views);
 
-        loadImage(views, widgetId, app.headerImage);
+            loadImage(views, widgetId, app.headerImage);
+        }
     }
 
     private void startUpdate(int appWidgetId, boolean needRetry, boolean forceRefresh) {

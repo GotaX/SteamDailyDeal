@@ -9,6 +9,7 @@ import com.android.volley.VolleyError;
 import com.gota.steamdailydeal.constants.Pref;
 import com.gota.steamdailydeal.constants.StorefrontAPI;
 import com.gota.steamdailydeal.entity.AppInfo;
+import com.gota.steamdailydeal.entity.CategoryInfo;
 import com.gota.steamdailydeal.entity.FeaturedCategories;
 import com.gota.steamdailydeal.exception.NoNetworkException;
 import com.gota.steamdailydeal.volley.GsonRequest;
@@ -58,8 +59,9 @@ public class RefreshDataTask {
                 new Response.Listener<FeaturedCategories>() {
                     @Override
                     public void onResponse(FeaturedCategories featuredCategories) {
-                        AppInfo app = featuredCategories.getDailyDeal().items.get(0);
-                        if (updateRefreshInfo(app) || mForceRefresh) {
+                        CategoryInfo catDailyDeal = featuredCategories.getDailyDeal();
+                        AppInfo app = catDailyDeal == null ? null : catDailyDeal.items.get(0);
+                        if (mForceRefresh || app == null || updateRefreshInfo(app)) {
                             mListener.onUpdateUI(mViews, mWidgetId, app);
                         } else if (mRetryCount < mRetryTime) {
                             Log.d(App.TAG, "Retry " + mRetryCount);
