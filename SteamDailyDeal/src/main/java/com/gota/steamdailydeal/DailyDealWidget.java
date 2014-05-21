@@ -3,20 +3,24 @@ package com.gota.steamdailydeal;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
-import com.gota.steamdailydeal.constants.Steam;
-import com.gota.steamdailydeal.entity.AppInfo;
-import com.gota.steamdailydeal.exception.NoNetworkException;
-import com.gota.steamdailydeal.util.MyTextUtils;
+import com.android.volley.toolbox.StringRequest;
+import com.gota.steamdailydeal.constants.StorefrontAPI;
+import com.gota.steamdailydeal.data.DataProvider;
 
 import java.util.Arrays;
 
@@ -24,7 +28,7 @@ import java.util.Arrays;
 /**
  * Implementation of App Widget functionality.
  */
-public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTask.UpdateUIListener {
+public class DailyDealWidget extends AppWidgetProvider {
 
     public static final String ACTION_REFRESH = "com.gota.dailydeal.action_refresh";
 
@@ -32,24 +36,21 @@ public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTas
     public static final String KEY_NEED_RETRY = "keyNeedRetry";
     public static final String KEY_FORCE_REFRESH = "keyForceRefresh";
 
-    private Context mContext;
-    private AppWidgetManager mAppWidgetManager;
+    private static DataProviderObserver sDataObserver;
+    private static HandlerThread sWorkerThread;
+    private static Handler sWorkerQueue;
+
+    public DailyDealWidget() {
+        sWorkerThread = new HandlerThread("DailyDealWidget-worker");
+        sWorkerThread.start();
+        sWorkerQueue = new Handler(sWorkerThread.getLooper());
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(App.TAG, "on receive " + intent.getAction());
-
-        this.mContext = context;
-        this.mAppWidgetManager = AppWidgetManager.getInstance(context);
-
         String action = intent.getAction();
         if (ACTION_REFRESH.equals(action)) {
-            int widgetId = intent.getIntExtra(KEY_WIDGET_ID, 0);
-            boolean needRetry = intent.getBooleanExtra(KEY_NEED_RETRY, false);
-            boolean forceRefresh = intent.getBooleanExtra(KEY_FORCE_REFRESH, false);
-            boolean alarm = intent.getBooleanExtra("alarm", false);
-            Log.d(App.TAG, String.format("receive: needRetry= %s, forceRefresh=%s, alarm=%s", needRetry, forceRefresh, alarm));
-            startUpdate(widgetId, needRetry, forceRefresh);
+            loadData(context);
         } else {
             super.onReceive(context, intent);
         }
@@ -59,8 +60,31 @@ public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTas
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(App.TAG, "on update: " + Arrays.toString(appWidgetIds));
         for (int appWidgetId : appWidgetIds) {
-            startUpdate(appWidgetId, false, false);
+            RemoteViews views = newRemoteViews();
+            Intent intent = new Intent(context, MyWidgetService.class);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+            views.setRemoteAdapter(R.id.vf_main, intent);
+
+            views.setEmptyView(R.id.vf_main, R.id.empty);
+
+            // Init refresh button
+            Intent refreshIntent = new Intent(context, DailyDealWidget.class);
+            refreshIntent.setAction(ACTION_REFRESH);
+            PendingIntent piRefresh = PendingIntent.getBroadcast(
+                    context, 0, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.btn_refresh, piRefresh);
+
+            // Init onclick image
+            Intent ivf = new Intent(Intent.ACTION_VIEW);
+            PendingIntent pivf = PendingIntent.getActivity(
+                    context, 0, ivf, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setPendingIntentTemplate(R.id.vf_main, pivf);
+
+            // update widget
+            appWidgetManager.updateAppWidget(appWidgetId, views);
         }
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
     @Override
@@ -70,118 +94,88 @@ public class DailyDealWidget extends AppWidgetProvider implements RefreshDataTas
         App.queue.stop();
         App.instance.cancelAlarm();
         App.prefs.edit().clear().commit();
+        unregisterObserver(context);
     }
 
     @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
         Log.d(App.TAG, "on enabled");
-
+        registerObserver(context);
     }
 
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
         Log.d(App.TAG, "on disabled");
-    }
-
-    @Override
-    public void onUpdateUI(RemoteViews views, int widgetId, AppInfo app) {
-        if (app == null) {
-            views.setViewVisibility(R.id.area_price, View.INVISIBLE);
-            views.setViewVisibility(R.id.tv_name, View.INVISIBLE);
-            views.setImageViewResource(R.id.img_header, R.drawable.no_daily_deal);
-            mAppWidgetManager.updateAppWidget(widgetId, views);
-        } else {
-            String discountPercent = String.format("-%s%s", app.discountPercent, "%");
-            views.setTextViewText(R.id.tv_discount_percent, discountPercent);
-
-            String originalPrice = String.format("$%s", app.originalPrice / 100f);
-            views.setTextViewText(R.id.tv_original_price, MyTextUtils.strikethrough(originalPrice));
-
-            String price = String.format("$%s %s", app.finalPrice / 100f, app.currency);
-            views.setTextViewText(R.id.tv_price, price);
-
-            views.setTextViewText(R.id.tv_name, app.name);
-            initOnClickUrl(views, app.id);
-
-            views.setImageViewResource(R.id.img_header, R.drawable.loading);
-            mAppWidgetManager.updateAppWidget(widgetId, views);
-
-            loadImage(views, widgetId, app.headerImage);
-        }
-    }
-
-    private void startUpdate(int appWidgetId, boolean needRetry, boolean forceRefresh) {
-        RemoteViews views = newRemoteViews();
-        startNewTask(views, appWidgetId, needRetry, forceRefresh);
-        initViews(views, appWidgetId);
+        unregisterObserver(context);
     }
 
     private RemoteViews newRemoteViews() {
-        return new RemoteViews(App.instance.getPackageName(), R.layout.daily_deal_widget);
+        return new RemoteViews(App.instance.getPackageName(), R.layout.widget_main);
     }
 
-    private void startNewTask(RemoteViews views, int widgetId,
-                              boolean needRetry, boolean forceRefresh) {
-        int retryTime = needRetry ? RefreshDataTask.DEFAULT_RETRY_TIME : 0;
-        RefreshDataTask task = new RefreshDataTask(retryTime, views, widgetId, forceRefresh, this);
-        if (forceRefresh || task.isNeedToUpdate()) {
-            try {
-                task.start();
-            } catch (NoNetworkException e) {
-                Toast.makeText(mContext, R.string.no_available_network, Toast.LENGTH_SHORT).show();
-                views.setImageViewResource(R.id.img_header, R.drawable.not_found);
-            }
-        }
-    }
-
-    private void initViews(RemoteViews views, int widgetId) {
-        initButtons(views, widgetId);
-        mAppWidgetManager.updateAppWidget(widgetId, views);
-    }
-
-    private void initButtons(RemoteViews views, int appWidgetId) {
-        Log.d(App.TAG, "init button.");
-        Intent refreshIntent = new Intent(mContext, DailyDealWidget.class);
-        refreshIntent.setAction(ACTION_REFRESH);
-        refreshIntent.putExtra(KEY_WIDGET_ID, appWidgetId);
-        refreshIntent.putExtra(KEY_NEED_RETRY, false);
-        refreshIntent.putExtra(KEY_FORCE_REFRESH, true);
-        PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(
-                mContext, 0, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setOnClickPendingIntent(R.id.btn_refresh, refreshPendingIntent);
-        mAppWidgetManager.updateAppWidget(appWidgetId, views);
-    }
-
-    private void initOnClickUrl(RemoteViews views, int appId) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(Steam.getStoreLink(appId)));
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setOnClickPendingIntent(R.id.img_header, pendingIntent);
-    }
-
-    private void loadImage(final RemoteViews views, final int appWidgetId, String url) {
-        Log.d(App.TAG, "Start load image!");
-        App.imgLoader.get(url, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                Log.d(App.TAG, "Load image success!");
-                views.setImageViewBitmap(R.id.img_header, imageContainer.getBitmap());
-                mAppWidgetManager.updateAppWidget(appWidgetId, views);
-            }
-
+    private void loadData(final Context context) {
+        App.queue.add(new StringRequest(
+                Request.Method.GET,
+                StorefrontAPI.FEATURED_CATEGORIES,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.d(App.TAG, "JSON: " + s);
+                        ContentValues values = new ContentValues();
+                        values.put(DataProvider.KEY_JSON, s);
+                        ContentResolver cr = context.getContentResolver();
+                        cr.update(DataProvider.CONTENT_URI, values, null, null);
+                    }
+                }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Log.d(App.TAG, "Load image error!");
-                views.setImageViewResource(R.id.img_header, R.drawable.not_found);
-                mAppWidgetManager.updateAppWidget(appWidgetId, views);
+                Log.e(App.TAG, "Error on request json!", volleyError);
             }
-        });
+        }));
         App.queue.start();
     }
 
+    private void registerObserver(Context context) {
+        ContentResolver cr = context.getContentResolver();
+        if (sDataObserver == null) {
+            AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+            ComponentName cn = new ComponentName(context, DataProvider.class);
+            sDataObserver = new DataProviderObserver(mgr, cn, sWorkerQueue);
+            cr.registerContentObserver(DataProvider.CONTENT_URI, true, sDataObserver);
+            Log.d(App.TAG, "Register observer!");
+        }
+    }
+
+    private void unregisterObserver(Context context) {
+        if (sDataObserver != null) {
+            context.getContentResolver().unregisterContentObserver(sDataObserver);
+            sDataObserver = null;
+            Log.d(App.TAG, "Unregister observer!");
+        }
+    }
+
+    class DataProviderObserver extends ContentObserver {
+        private AppWidgetManager mAppWidgetManager;
+        private ComponentName mComponentName;
+
+        DataProviderObserver(AppWidgetManager mgr, ComponentName cn, Handler h) {
+            super(h);
+            mAppWidgetManager = mgr;
+            mComponentName = cn;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            // The data has changed, so notify the widget that the collection view needs to be updated.
+            // In response, the factory's onDataSetChanged() will be called which will requery the
+            // cursor for the new data.
+            Log.d(App.TAG, "Notify app widget view data changed!");
+            mAppWidgetManager.notifyAppWidgetViewDataChanged(
+                    mAppWidgetManager.getAppWidgetIds(mComponentName), R.id.vf_main);
+        }
+    }
 }
 
 

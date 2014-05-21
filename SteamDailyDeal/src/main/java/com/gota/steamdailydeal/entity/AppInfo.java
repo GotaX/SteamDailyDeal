@@ -6,8 +6,8 @@ import com.google.gson.annotations.SerializedName;
  * Created by Gota on 2014/5/16.
  * Email: G.tianxiang@gmail.com
  */
-public class AppInfo {
-    public int id;
+    public class AppInfo {
+    public String id;
     public int type;
     public String name;
     public boolean discounted;

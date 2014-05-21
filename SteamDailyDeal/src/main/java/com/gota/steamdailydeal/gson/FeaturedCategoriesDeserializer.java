@@ -20,16 +20,16 @@ public class FeaturedCategoriesDeserializer
             JsonDeserializationContext context) throws JsonParseException {
         
         FeaturedCategories fc = mGson.fromJson(json, FeaturedCategories.class);
-        
-       JsonObject obj = json.getAsJsonObject();
+
+        JsonObject obj = json.getAsJsonObject();
         int i = 0;
         while (true) {
             String strNum = String.valueOf(i++);
-            JsonElement element = obj.get(strNum);
+            JsonElement element = obj.getAsJsonObject(strNum);
             if (element == null) break;
-            
+
             CategoryInfo ci = mGson.fromJson(element, CategoryInfo.class);
-            fc.catSpotlight.put(strNum, ci);
+            fc.map.put(strNum, ci);
         }
         
         return fc;

@@ -9,5 +9,6 @@
     <string name="action_settings">Settings</string>
     <string name="tv_refresh_time">更新时间</string>
     <string name="no_available_network">没有可用网络!</string>
+    <string name="no_data">No Data</string>
 
 </resources>
