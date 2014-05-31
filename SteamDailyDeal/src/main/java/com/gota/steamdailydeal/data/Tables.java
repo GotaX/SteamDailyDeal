@@ -8,7 +8,36 @@ import android.provider.BaseColumns;
  */
 public class Tables {
 
+    public static interface SQL {
+        public static final String DEALS_JOIN_APP_INFO =
+                TDeals.TABLE + " inner join " + TAppInfo.TABLE + " on " +
+                TDeals.TABLE + "." + TDeals.APP_ID + " = " +
+                TAppInfo.TABLE + "." + TAppInfo.ID;
+
+        public static final String[] DEALS_JOIN_APP_INFO_PROJECTION = {
+                TAppInfo.ID, TAppInfo.TYPE, TAppInfo.NAME, TAppInfo.DISCOUNTED,
+                TAppInfo.DISCOUNT_PERCENT, TAppInfo.ORIGINAL_PRICE, TAppInfo.FINAL_PRICE,
+                TAppInfo.CURRENCY, TAppInfo.LARGE_CAPSULE_IMAGE, TAppInfo.SMALL_CAPSULE_IMAGE,
+                TAppInfo.DISCOUNT_EXPIRATION, TAppInfo.HEADLINE, TAppInfo.CONTROLLER_SUPPORT,
+                TAppInfo.PURCHASE_PACKAGE
+        };
+    }
+
+    public static interface TDeals extends BaseColumns {
+        public static final String TABLE = "deals";
+
+        public static final String TYPE = "deal_type";
+        public static final String APP_ID = "app_id";
+
+        public static final int TYPE_DAILY_DEAL = 1;
+        public static final int TYPE_WEEK_LONG_DEAL = 2;
+        public static final int TYPE_WEDNESDAY_DEAL = 3;
+        public static final int TYPE_SOPTLIGHT = 4;
+    }
+
     public static interface TAppInfo extends BaseColumns {
+        public static final String TABLE = "app_info";
+
         public static final String ID = "app_id";
         public static final String TYPE = "type";
         public static final String NAME = "app_name";
@@ -24,13 +53,20 @@ public class Tables {
 
         public static final String CONTROLLER_SUPPORT = "controller_support";
         public static final String PURCHASE_PACKAGE = "purchase_package";
+    }
 
+    public static interface TSpotlight extends BaseColumns {
+        public static final String TABLE = "spotlight";
+
+        public static final String NAME = "name";
         public static final String HEADER_IMAGE = "header_image";
         public static final String BODY = "body";
         public static final String URL = "url";
     }
 
     public static interface TFeatured extends BaseColumns {
+        public static final String TABLE = "featured";
+
         public static final String ID = "cat_id";
         public static final String NAME = "cat_name";
         public static final String ITEMS = "items";
