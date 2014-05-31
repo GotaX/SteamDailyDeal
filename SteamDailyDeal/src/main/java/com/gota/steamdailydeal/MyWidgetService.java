@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.gota.steamdailydeal.data.DataProvider;
+import com.gota.steamdailydeal.data.Tables;
+import com.gota.steamdailydeal.util.MyTextUtils;
 
 /**
  * Created by Gota on 2014/5/20.
@@ -22,10 +26,10 @@ public class MyWidgetService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new FliperRemoteViewsFactory(this.getApplicationContext(), intent);
+        return new FlipperRemoteViewsFactory(this.getApplicationContext(), intent);
     }
 
-    static class FliperRemoteViewsFactory implements RemoteViewsFactory {
+    static class FlipperRemoteViewsFactory implements RemoteViewsFactory {
 
         private static Bitmap sPicNotFound;
 
@@ -34,7 +38,7 @@ public class MyWidgetService extends RemoteViewsService {
         private Cursor mCursor;
         private Context mContext;
 
-        public FliperRemoteViewsFactory(Context context, Intent intent) {
+        public FlipperRemoteViewsFactory(Context context, Intent intent) {
             this.mContext = context;
             sPicNotFound = BitmapFactory.decodeResource(
                     mContext.getResources(), R.drawable.not_found);
@@ -54,8 +58,8 @@ public class MyWidgetService extends RemoteViewsService {
             if (mCursor != null) {
                 mCursor.close();
             }
-            mCursor = mContext.getContentResolver().query(
-                    DataProvider.CONTENT_URI, null, null, null, null);
+            Uri uri = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DEAL);
+            mCursor = mContext.getContentResolver().query(uri, null, null, null, null);
         }
 
         @Override
@@ -73,66 +77,81 @@ public class MyWidgetService extends RemoteViewsService {
         @Override
         public RemoteViews getViewAt(int position) {
             Log.d(App.TAG, "Get view at " + position);
-            RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
+
             mCursor.moveToPosition(position);
-/*
 
-            int fidIndex = mCursor.getColumnIndex(Tables.TFeatured.ID);
-            String fid = mCursor.getString(fidIndex);
-*/
+            int categoryIndex = mCursor.getColumnIndex(Tables.TDeals.CATEGORY);
+            int category = mCursor.getInt(categoryIndex);
 
-            /*if (StorefrontAPI.CAT_SPOTLIGHT.equals(fid)) {
-                Log.d(App.TAG, "Setup view spotlight");
-                String imgHeader = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.HEADER_IMAGE));
-                String name = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.NAME));
-                String body = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.BODY));
-                String url = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.URL));
-                Bitmap bitmapHeader = getNetImage(imgHeader);
+            switch (category) {
+                case Tables.TDeals.CAT_DAILY_DEAL:
+                    return setupDailyDealView();
+                case Tables.TDeals.CAT_SPOTLIGHT:
+                    return setupSpotLightView();
+                default:
+                    return null;
+            }
+        }
 
-                views.setImageViewBitmap(R.id.img_header, bitmapHeader);
-                views.setTextViewText(R.id.tv_name, name);
-                views.setViewVisibility(R.id.area_price, View.GONE);
+        private RemoteViews setupDailyDealView() {
+            RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
 
-                Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                views.setOnClickFillInIntent(R.id.img_header, clickIntent);
-            } else if(StorefrontAPI.CAT_DAILYDEAL.equals(fid)) {
-                Log.d(App.TAG, "Setup view dailydeal");
-                String imgHeader = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.HEADER_IMAGE));
-                String name = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.NAME));
-                int originalPrice = mCursor.getInt(
-                        mCursor.getColumnIndex(Tables.TAppInfo.ORIGINAL_PRICE));
-                int price = mCursor.getInt(
-                        mCursor.getColumnIndex(Tables.TAppInfo.FINAL_PRICE));
-                String appId = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.ID));
-                String currency = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.CURRENCY));
-                String discountPercent = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TAppInfo.DISCOUNT_PERCENT));
+            Log.d(App.TAG, "Setup view daily deal");
+            String imgHeader = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
+            String name = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.NAME));
+            int originalPrice = mCursor.getInt(
+                    mCursor.getColumnIndex(Tables.TDeals.ORIGINAL_PRICE));
+            int price = mCursor.getInt(
+                    mCursor.getColumnIndex(Tables.TDeals.FINAL_PRICE));
+            String appId = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.ID));
+            String currency = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.CURRENCY));
+            String discountPercent = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.DISCOUNT_PERCENT));
 
-                CharSequence sOriginalPrice = MyTextUtils.getCurrency(
-                        originalPrice, currency);
-                sOriginalPrice = MyTextUtils.strikethrough(sOriginalPrice);
-                CharSequence sPrice = MyTextUtils.getCurrency(price, currency);
-                CharSequence sDiscountPercent = MyTextUtils.getDiscount(discountPercent);
-                String url = MyTextUtils.getStoreLink(appId);
-                Bitmap bitmapHeader = getNetImage(imgHeader);
+            CharSequence sOriginalPrice = MyTextUtils.getCurrency(
+                    originalPrice, currency);
+            sOriginalPrice = MyTextUtils.strikethrough(sOriginalPrice);
+            CharSequence sPrice = MyTextUtils.getCurrency(price, currency);
+            CharSequence sDiscountPercent = MyTextUtils.getDiscount(discountPercent);
+            String url = MyTextUtils.getStoreLink(appId);
+            Bitmap bitmapHeader = getNetImage(imgHeader);
 
-                views.setImageViewBitmap(R.id.img_header, bitmapHeader);
-                views.setTextViewText(R.id.tv_name, name);
-                views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
-                views.setTextViewText(R.id.tv_price, sPrice);
-                views.setTextViewText(R.id.tv_discount_percent, sDiscountPercent);
+            views.setImageViewBitmap(R.id.img_header, bitmapHeader);
+            views.setTextViewText(R.id.tv_name, name);
+            views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
+            views.setTextViewText(R.id.tv_price, sPrice);
+            views.setTextViewText(R.id.tv_discount_percent, sDiscountPercent);
 
-                Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                views.setOnClickFillInIntent(R.id.img_header, clickIntent);
-            }*/
+            Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            views.setOnClickFillInIntent(R.id.img_header, clickIntent);
+
+            return views;
+        }
+
+        private RemoteViews setupSpotLightView() {
+            Log.d(App.TAG, "Setup view spotlight");
+            RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
+
+            String imgHeader = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
+            String name = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.NAME));
+            String body = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.BODY));
+            String url = mCursor.getString(
+                    mCursor.getColumnIndex(Tables.TDeals.URL));
+            Bitmap bitmapHeader = getNetImage(imgHeader);
+
+            views.setImageViewBitmap(R.id.img_header, bitmapHeader);
+            views.setTextViewText(R.id.tv_name, name);
+            views.setViewVisibility(R.id.area_price, View.GONE);
+
+            Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            views.setOnClickFillInIntent(R.id.img_header, clickIntent);
 
             return views;
         }
