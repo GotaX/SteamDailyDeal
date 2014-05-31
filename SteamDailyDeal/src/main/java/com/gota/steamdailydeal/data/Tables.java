@@ -9,65 +9,49 @@ import android.provider.BaseColumns;
 public class Tables {
 
     public static interface SQL {
-        public static final String DEALS_JOIN_APP_INFO =
-                TDeals.TABLE + " inner join " + TAppInfo.TABLE + " on " +
-                TDeals.TABLE + "." + TDeals.APP_ID + " = " +
-                TAppInfo.TABLE + "." + TAppInfo.ID;
-
-        public static final String[] DEALS_JOIN_APP_INFO_PROJECTION = {
-                TAppInfo.ID, TAppInfo.TYPE, TAppInfo.NAME, TAppInfo.DISCOUNTED,
-                TAppInfo.DISCOUNT_PERCENT, TAppInfo.ORIGINAL_PRICE, TAppInfo.FINAL_PRICE,
-                TAppInfo.CURRENCY, TAppInfo.LARGE_CAPSULE_IMAGE, TAppInfo.SMALL_CAPSULE_IMAGE,
-                TAppInfo.DISCOUNT_EXPIRATION, TAppInfo.HEADLINE, TAppInfo.CONTROLLER_SUPPORT,
-                TAppInfo.PURCHASE_PACKAGE
+        String[] PROJECTION_DAILY_DEAL = {
+                TDeals._ID, TDeals.ID, TDeals.TYPE, TDeals.DISCOUNTED,
+                TDeals.CURRENCY, TDeals.ORIGINAL_PRICE, TDeals.FINAL_PRICE,
+                TDeals.DISCOUNT_PERCENT, TDeals.NAME, TDeals.HEADER_IMAGE,
+                TDeals.PURCHASE_PACKAGE
+        };
+        String[] PROJECTION_SPOTLIGHT = {
+                TDeals._ID, TDeals.NAME, TDeals.HEADER_IMAGE, TDeals.BODY,
+                TDeals.URL
+        };
+        String[] PROJECTION_WEEK_LONG = {
+                // TODO: Write week long projection
         };
     }
 
     public static interface TDeals extends BaseColumns {
-        public static final String TABLE = "deals";
+        String TABLE = "deal";
 
-        public static final String TYPE = "deal_type";
-        public static final String APP_ID = "app_id";
+        String ID = "app_id";
+        String TYPE = "type";
+        String NAME = "app_name";
+        String DISCOUNTED = "discounted";
+        String DISCOUNT_PERCENT = "discount_percent";
+        String ORIGINAL_PRICE = "original_price";
+        String FINAL_PRICE = "final_price";
+        String CURRENCY = "currency";
+        String LARGE_CAPSULE_IMAGE = "large_capsule_image";
+        String SMALL_CAPSULE_IMAGE = "small_capsule_image";
+        String DISCOUNT_EXPIRATION = "discount_expiration";
+        String HEADLINE = "headline";
 
-        public static final int TYPE_DAILY_DEAL = 1;
-        public static final int TYPE_SPOTLIGHT = 2;
-    }
+        String CONTROLLER_SUPPORT = "controller_support";
+        String PURCHASE_PACKAGE = "purchase_package";
 
-    public static interface TAppInfo extends BaseColumns {
-        public static final String TABLE = "app_info";
+        String HEADER_IMAGE = "header_image";
+        String BODY = "body";
+        String URL = "url";
 
-        public static final String ID = "app_id";
-        public static final String TYPE = "type";
-        public static final String NAME = "app_name";
-        public static final String DISCOUNTED = "discounted";
-        public static final String DISCOUNT_PERCENT = "discount_percent";
-        public static final String ORIGINAL_PRICE = "original_price";
-        public static final String FINAL_PRICE = "final_price";
-        public static final String CURRENCY = "currency";
-        public static final String LARGE_CAPSULE_IMAGE = "large_capsule_image";
-        public static final String SMALL_CAPSULE_IMAGE = "small_capsule_image";
-        public static final String DISCOUNT_EXPIRATION = "discount_expiration";
-        public static final String HEADLINE = "headline";
+        String CATEGORY = "category";
 
-        public static final String CONTROLLER_SUPPORT = "controller_support";
-        public static final String PURCHASE_PACKAGE = "purchase_package";
-    }
-
-    public static interface TSpotlight extends BaseColumns {
-        public static final String TABLE = "spotlight";
-
-        public static final String NAME = "name";
-        public static final String HEADER_IMAGE = "header_image";
-        public static final String BODY = "body";
-        public static final String URL = "url";
-    }
-
-    public static interface TFeatured extends BaseColumns {
-        public static final String TABLE = "featured";
-
-        public static final String ID = "cat_id";
-        public static final String NAME = "cat_name";
-        public static final String ITEMS = "items";
+        int CAT_DAILY_DEAL = 1;
+        int CAT_SPOTLIGHT = 2;
+        int CAT_WEEK_LONG_DEAL = 3;
     }
 
 }

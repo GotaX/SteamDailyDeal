@@ -1,12 +1,15 @@
 package com.gota.steamdailydeal.entity;
 
+import android.content.ContentValues;
+
 import com.google.gson.annotations.SerializedName;
+import com.gota.steamdailydeal.data.Tables;
 
 /**
  * Created by Gota on 2014/5/16.
  * Email: G.tianxiang@gmail.com
  */
-    public class AppInfo {
+public class AppInfo {
     public String id;
     public int type;
     public String name;
@@ -49,7 +52,7 @@ import com.google.gson.annotations.SerializedName;
     @Override
     public String toString() {
         return "AppInfo{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", type=" + type +
                 ", name='" + name + '\'' +
                 ", discounted=" + discounted +
@@ -67,5 +70,27 @@ import com.google.gson.annotations.SerializedName;
                 ", body='" + body + '\'' +
                 ", url='" + url + '\'' +
                 '}';
+    }
+
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(Tables.TDeals.ID, id);
+        values.put(Tables.TDeals.TYPE, type);
+        values.put(Tables.TDeals.NAME, name);
+        values.put(Tables.TDeals.DISCOUNTED, discounted);
+        values.put(Tables.TDeals.DISCOUNT_PERCENT, discountPercent);
+        values.put(Tables.TDeals.ORIGINAL_PRICE, originalPrice);
+        values.put(Tables.TDeals.FINAL_PRICE, finalPrice);
+        values.put(Tables.TDeals.CURRENCY, currency);
+        values.put(Tables.TDeals.LARGE_CAPSULE_IMAGE, largeCapsuleImage);
+        values.put(Tables.TDeals.SMALL_CAPSULE_IMAGE, smallCapsuleImage);
+        values.put(Tables.TDeals.DISCOUNT_EXPIRATION, discountExpiration);
+        values.put(Tables.TDeals.HEADLINE, headline);
+        values.put(Tables.TDeals.CONTROLLER_SUPPORT, controllerSupport);
+        values.put(Tables.TDeals.PURCHASE_PACKAGE, purchasePackage);
+        values.put(Tables.TDeals.HEADER_IMAGE, headerImage);
+        values.put(Tables.TDeals.BODY, body);
+        values.put(Tables.TDeals.URL, url);
+        return values;
     }
 }

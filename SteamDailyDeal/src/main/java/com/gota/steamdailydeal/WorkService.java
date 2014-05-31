@@ -8,10 +8,15 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.gota.steamdailydeal.constants.StorefrontAPI;
+import com.gota.steamdailydeal.entity.Deal;
+import com.gota.steamdailydeal.util.JSONUtils;
+import com.gota.steamdailydeal.util.SQLUtils;
 
-import org.json.JSONObject;
+import org.json.JSONException;
+
+import java.util.List;
 
 public class WorkService extends IntentService {
 
@@ -40,14 +45,18 @@ public class WorkService extends IntentService {
     }
 
     private void handleActionUpdateData() {
-        App.queue.add(new JsonObjectRequest(
+        App.queue.add(new StringRequest(
                 Request.Method.GET,
                 StorefrontAPI.FEATURED_CATEGORIES,
-                null,
-                new Response.Listener<JSONObject>() {
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        processJSONObject(jsonObject);
+                    public void onResponse(String s) {
+                        try {
+                            List<Deal> deals = JSONUtils.parseDeal(s);
+                            SQLUtils.saveDeals(getContentResolver(), deals);
+                        } catch (JSONException e) {
+                            Log.e(App.TAG, "Error on parse JSON!", e);
+                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -55,10 +64,6 @@ public class WorkService extends IntentService {
                         Log.e(App.TAG, "Error on request JSON!", volleyError);
                     }
                 }));
-    }
-
-    private void processJSONObject(JSONObject jsonObject) {
-
     }
 
 }

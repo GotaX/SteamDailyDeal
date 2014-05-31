@@ -21,12 +21,20 @@ import java.util.List;
  */
 public class JSONUtils {
 
-    public static List<Deal> parseDeal(InputStream in) throws JSONException {
-        ArrayList<Deal> deals = new ArrayList<>();
+    public static List<Deal> parseDeal(String json) throws JSONException {
+        JsonParser parser = new JsonParser();
+        JsonElement root = parser.parse(json);
+        return processJson(root);
+    }
 
+    public static List<Deal> parseDeal(InputStream in) throws JSONException {
         JsonParser parser = new JsonParser();
         JsonElement root = parser.parse(new InputStreamReader(in));
+        return processJson(root);
+    }
 
+    private static List<Deal> processJson(JsonElement root) throws JSONException {
+        ArrayList<Deal> deals = new ArrayList<>();
         JsonObject rootObj = root.getAsJsonObject();
         for (int i = 0; rootObj.has(String.valueOf(i)); i++) {
             JsonObject item = rootObj.getAsJsonObject(String.valueOf(i));
@@ -42,10 +50,10 @@ public class JSONUtils {
         String category = obj.get("id").getAsString();
         switch (category) {
             case "cat_spotlight":
-                deal.type = Tables.TDeals.TYPE_SPOTLIGHT;
+                deal.category = Tables.TDeals.CAT_SPOTLIGHT;
                 break;
             case "cat_dailydeal":
-                deal.type = Tables.TDeals.TYPE_DAILY_DEAL;
+                deal.category = Tables.TDeals.CAT_DAILY_DEAL;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown category: " + category);
