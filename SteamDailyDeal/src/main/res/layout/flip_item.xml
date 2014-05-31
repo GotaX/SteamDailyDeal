@@ -18,7 +18,7 @@
         android:singleLine="true"
         android:textSize="20sp"
         android:textColor="@android:color/primary_text_dark"
-        android:background="@color/tv_name_bg"
+        android:background="@color/bg_tv_name"
         android:textStyle="bold"
         android:gravity="center"
         android:ellipsize="marquee"

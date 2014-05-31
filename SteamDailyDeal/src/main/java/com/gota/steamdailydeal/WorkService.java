@@ -9,7 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.gota.steamdailydeal.constants.StorefrontAPI;
+import com.gota.steamdailydeal.constants.SteamAPI;
 import com.gota.steamdailydeal.entity.Deal;
 import com.gota.steamdailydeal.util.JSONUtils;
 import com.gota.steamdailydeal.util.SQLUtils;
@@ -49,7 +49,7 @@ public class WorkService extends IntentService {
         Log.d(App.TAG, "Handle update data action!");
         App.queue.add(new StringRequest(
                 Request.Method.GET,
-                StorefrontAPI.FEATURED_CATEGORIES,
+                SteamAPI.FEATURED_CATEGORIES,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="tv_name_bg">#50000000</color>
+    <color name="bg_tv_name">#50000000</color>
+
+    <color name="bg_main">#101010</color>
+    <color name="bg_header_img">#CFD2D4</color>
+    <color name="bg_discount">#4c6b22</color>
+    <color name="text_discount">#929292</color>
+    <color name="text_primary">#D0D0D0</color>
+
 </resources>

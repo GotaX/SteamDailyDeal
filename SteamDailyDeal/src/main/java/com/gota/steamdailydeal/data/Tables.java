@@ -9,6 +9,10 @@ import android.provider.BaseColumns;
 public class Tables {
 
     public static interface SQL {
+        String[] PROJECTION_DAILY_DEAL_SMALL = {
+                TDeals._ID, TDeals.ID, TDeals.CURRENCY, TDeals.ORIGINAL_PRICE,
+                TDeals.FINAL_PRICE, TDeals.DISCOUNT_PERCENT, TDeals.NAME
+        };
         String[] PROJECTION_DAILY_DEAL = {
                 TDeals._ID, TDeals.ID, TDeals.TYPE, TDeals.DISCOUNTED,
                 TDeals.CURRENCY, TDeals.ORIGINAL_PRICE, TDeals.FINAL_PRICE,
