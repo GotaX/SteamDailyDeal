@@ -29,13 +29,11 @@ public class DataProvider extends ContentProvider {
     public static final int APP_INFO = 1;
     public static final int APP_INFO_ROW = 2;
     public static final int DAILY_DEAL = 3;
-    public static final int WEEK_LONG_DEAL = 4;
-    public static final int WEDNESDAY_DEAL = 5;
+    public static final int SPOTLIGHT = 4;
 
     public static final String PATH_APP_INFO = "appInfo";
     public static final String PATH_DAILY_DEAL = "dailyDeal";
-    public static final String PATH_WEEK_LONG_DEAL = "weekLongDeal";
-    public static final String PATH_WEDNESDAY_DEAL = "wednesdayDeal";
+    public static final String PATH_SPOTLIGHT = "spotlight";
 
     private static final UriMatcher sUriMatcher;
     static {
@@ -43,8 +41,7 @@ public class DataProvider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, PATH_APP_INFO, APP_INFO);
         sUriMatcher.addURI(AUTHORITY, PATH_APP_INFO + "/#", APP_INFO_ROW);
         sUriMatcher.addURI(AUTHORITY, PATH_DAILY_DEAL, DAILY_DEAL);
-        sUriMatcher.addURI(AUTHORITY, PATH_WEEK_LONG_DEAL, WEEK_LONG_DEAL);
-        sUriMatcher.addURI(AUTHORITY, PATH_WEDNESDAY_DEAL, WEDNESDAY_DEAL);
+        sUriMatcher.addURI(AUTHORITY, PATH_SPOTLIGHT, SPOTLIGHT);
     }
 
     private SQLiteDatabase db;
@@ -73,13 +70,9 @@ public class DataProvider extends ContentProvider {
                 builder.setTables(SQL.DEALS_JOIN_APP_INFO);
                 builder.appendWhere(TDeals.TYPE + "=" + TDeals.TYPE_DAILY_DEAL);
                 break;
-            case WEEK_LONG_DEAL:
+            case SPOTLIGHT:
                 builder.setTables(SQL.DEALS_JOIN_APP_INFO);
-                builder.appendWhere(TDeals.TYPE + "=" + TDeals.TYPE_WEEK_LONG_DEAL);
-                break;
-            case WEDNESDAY_DEAL:
-                builder.setTables(SQL.DEALS_JOIN_APP_INFO);
-                builder.appendWhere(TDeals.TYPE + "=" + TDeals.TYPE_WEDNESDAY_DEAL);
+                builder.appendWhere(TDeals.TYPE + "=" + TDeals.TYPE_SPOTLIGHT);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -99,9 +92,7 @@ public class DataProvider extends ContentProvider {
                 return "vnd.android.cursor.item/vnd.steam.appInfo";
             case DAILY_DEAL:
                 return "vnd.android.cursor.dir/vnd.steam.appInfo";
-            case WEEK_LONG_DEAL:
-                return "vnd.android.cursor.dir/vnd.steam.appInfo";
-            case WEDNESDAY_DEAL:
+            case SPOTLIGHT:
                 return "vnd.android.cursor.dir/vnd.steam.appInfo";
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -122,13 +113,8 @@ public class DataProvider extends ContentProvider {
                 rowId = db.insert(TAppInfo.TABLE, null, values);
                 db.insert(TDeals.TABLE, null, values);
                 break;
-            case WEEK_LONG_DEAL:
-                values.put(TDeals.TYPE, TDeals.TYPE_WEEK_LONG_DEAL);
-                rowId = db.insert(TAppInfo.TABLE, null, values);
-                db.insert(TDeals.TABLE, null, values);
-                break;
-            case WEDNESDAY_DEAL:
-                values.put(TDeals.TYPE, TDeals.TYPE_WEDNESDAY_DEAL);
+            case SPOTLIGHT:
+                values.put(TDeals.TYPE, TDeals.TYPE_SPOTLIGHT);
                 rowId = db.insert(TAppInfo.TABLE, null, values);
                 db.insert(TDeals.TABLE, null, values);
                 break;
@@ -153,10 +139,8 @@ public class DataProvider extends ContentProvider {
                 return db.delete(TAppInfo.TABLE, TAppInfo._ID + "=" + uri.getLastPathSegment(), null);
             case DAILY_DEAL:
                 return db.delete(TDeals.TABLE, TDeals.TYPE + "=" + TDeals.TYPE_DAILY_DEAL, null);
-            case WEEK_LONG_DEAL:
-                return db.delete(TDeals.TABLE, TDeals.TYPE + "=" + TDeals.TYPE_WEEK_LONG_DEAL, null);
-            case WEDNESDAY_DEAL:
-                return db.delete(TDeals.TABLE, TDeals.TYPE + "=" + TDeals.TYPE_WEDNESDAY_DEAL, null);
+            case SPOTLIGHT:
+                return db.delete(TDeals.TABLE, TDeals.TYPE + "=" + TDeals.TYPE_SPOTLIGHT, null);
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -175,13 +159,9 @@ public class DataProvider extends ContentProvider {
                 where = SQLUtils.createWhere(
                         TDeals.TYPE + "=" + TDeals.TYPE_DAILY_DEAL, selection);
                 return db.update(TDeals.TABLE, values, where, selectionArgs);
-            case WEEK_LONG_DEAL:
+            case SPOTLIGHT:
                 where = SQLUtils.createWhere(
-                        TDeals.TYPE + "=" + TDeals.TYPE_WEEK_LONG_DEAL, selection);
-                return db.update(TDeals.TABLE, values, where, selectionArgs);
-            case WEDNESDAY_DEAL:
-                where = SQLUtils.createWhere(
-                        TDeals.TYPE + "=" + TDeals.TYPE_WEDNESDAY_DEAL, selection);
+                        TDeals.TYPE + "=" + TDeals.TYPE_SPOTLIGHT, selection);
                 return db.update(TDeals.TABLE, values, where, selectionArgs);
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);

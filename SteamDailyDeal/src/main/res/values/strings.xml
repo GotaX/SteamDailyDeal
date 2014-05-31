@@ -10,5 +10,6 @@
     <string name="tv_refresh_time">更新时间</string>
     <string name="no_available_network">没有可用网络!</string>
     <string name="no_data">No Data</string>
+    <string name="title_activity_test">TestActivity</string>
 
 </resources>

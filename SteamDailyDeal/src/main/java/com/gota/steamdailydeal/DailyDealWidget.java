@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -122,11 +121,11 @@ public class DailyDealWidget extends AppWidgetProvider {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        Log.d(App.TAG, "JSON: " + s);
+                        /*Log.d(App.TAG, "JSON: " + s);
                         ContentValues values = new ContentValues();
                         values.put(DataProvider.KEY_JSON, s);
                         ContentResolver cr = context.getContentResolver();
-                        cr.update(DataProvider.CONTENT_URI, values, null, null);
+                        cr.update(DataProvider.CONTENT_URI, values, null, null);*/
                     }
                 }, new Response.ErrorListener() {
             @Override

@@ -18,18 +18,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_APP_INFO =
             "create table " + TAppInfo.TABLE + " (" +
-            TAppInfo._ID + " INT PRIMARY KEY AUTOINCREMENT, " +
-            TAppInfo.ID + " INT NOT NULL UNIQUE, " +
-            TAppInfo.TYPE + " INT, " +
+            TAppInfo._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            TAppInfo.ID + " INTEGER NOT NULL UNIQUE, " +
+            TAppInfo.TYPE + " INTEGER, " +
             TAppInfo.NAME + " TEXT, " +
             TAppInfo.DISCOUNTED + " BOOLEAN, " +
-            TAppInfo.DISCOUNT_PERCENT + " INT, " +
-            TAppInfo.ORIGINAL_PRICE + " INT, " +
-            TAppInfo.FINAL_PRICE + " INT, " +
+            TAppInfo.DISCOUNT_PERCENT + " INTEGER, " +
+            TAppInfo.ORIGINAL_PRICE + " INTEGER, " +
+            TAppInfo.FINAL_PRICE + " INTEGER, " +
             TAppInfo.CURRENCY + " TEXT, " +
             TAppInfo.LARGE_CAPSULE_IMAGE + " TEXT, " +
             TAppInfo.SMALL_CAPSULE_IMAGE + " TEXT, " +
-            TAppInfo.DISCOUNT_EXPIRATION + " INT, " +
+            TAppInfo.DISCOUNT_EXPIRATION + " INTEGER, " +
             TAppInfo.HEADLINE + " TEXT, " +
             TAppInfo.CONTROLLER_SUPPORT + " TEXT, " +
             TAppInfo.PURCHASE_PACKAGE + " TEXT" +
@@ -37,9 +37,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_DEALS =
             "create table " + TDeals.TABLE + " (" +
-                    TDeals._ID + " INT PRIMARY KEY AUTOINCREMENT, " +
-                    TDeals.TYPE + " INT NOT NULL, " +
-                    TDeals.APP_ID + " INT NOT NULL" +
+                    TDeals._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    TDeals.TYPE + " INTEGER NOT NULL, " +
+                    TDeals.APP_ID + " INTEGER NOT NULL" +
                     ");";
 
     public static final String DROP_APP_INFO = "DROP TABLE IF EXISTS " + TAppInfo.TABLE;

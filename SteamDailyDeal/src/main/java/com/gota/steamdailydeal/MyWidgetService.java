@@ -6,18 +6,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
-import com.gota.steamdailydeal.constants.StorefrontAPI;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
-import com.gota.steamdailydeal.util.MyTextUtils;
 
 /**
  * Created by Gota on 2014/5/20.
@@ -84,7 +80,7 @@ public class MyWidgetService extends RemoteViewsService {
             int fidIndex = mCursor.getColumnIndex(Tables.TFeatured.ID);
             String fid = mCursor.getString(fidIndex);
 
-            if (StorefrontAPI.CAT_SPOTLIGHT.equals(fid)) {
+            /*if (StorefrontAPI.CAT_SPOTLIGHT.equals(fid)) {
                 Log.d(App.TAG, "Setup view spotlight");
                 String imgHeader = mCursor.getString(
                         mCursor.getColumnIndex(Tables.TAppInfo.HEADER_IMAGE));
@@ -135,7 +131,7 @@ public class MyWidgetService extends RemoteViewsService {
 
                 Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 views.setOnClickFillInIntent(R.id.img_header, clickIntent);
-            }
+            }*/
 
             return views;
         }

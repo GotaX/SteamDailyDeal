@@ -30,9 +30,7 @@ public class Tables {
         public static final String APP_ID = "app_id";
 
         public static final int TYPE_DAILY_DEAL = 1;
-        public static final int TYPE_WEEK_LONG_DEAL = 2;
-        public static final int TYPE_WEDNESDAY_DEAL = 3;
-        public static final int TYPE_SOPTLIGHT = 4;
+        public static final int TYPE_SPOTLIGHT = 2;
     }
 
     public static interface TAppInfo extends BaseColumns {
