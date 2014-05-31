@@ -11,5 +11,6 @@
     <string name="no_available_network">没有可用网络!</string>
     <string name="no_data">No Data</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="btn_test">Test</string>
 
 </resources>

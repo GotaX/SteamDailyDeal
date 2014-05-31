@@ -13,7 +13,6 @@ import android.widget.RemoteViewsService;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.gota.steamdailydeal.data.DataProvider;
-import com.gota.steamdailydeal.data.Tables;
 
 /**
  * Created by Gota on 2014/5/20.
@@ -76,9 +75,11 @@ public class MyWidgetService extends RemoteViewsService {
             Log.d(App.TAG, "Get view at " + position);
             RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
             mCursor.moveToPosition(position);
+/*
 
             int fidIndex = mCursor.getColumnIndex(Tables.TFeatured.ID);
             String fid = mCursor.getString(fidIndex);
+*/
 
             /*if (StorefrontAPI.CAT_SPOTLIGHT.equals(fid)) {
                 Log.d(App.TAG, "Setup view spotlight");

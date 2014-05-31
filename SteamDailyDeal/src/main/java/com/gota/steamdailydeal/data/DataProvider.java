@@ -48,10 +48,6 @@ public class DataProvider extends ContentProvider {
 
     private SQLiteDatabase db;
 
-    public static Uri getUriByPath(String path) {
-        return Uri.withAppendedPath(CONTENT_URI, path);
-    }
-
     @Override
     public boolean onCreate() {
         Context context = getContext();
@@ -118,6 +114,9 @@ public class DataProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         long rowId = 0;
         switch (sUriMatcher.match(uri)) {
+            case DEAL:
+                rowId = db.insert(TDeals.TABLE, null, values);
+                break;
             case DAILY_DEAL:
                 rowId = insertDeal(values, TDeals.CAT_DAILY_DEAL);
                 break;
@@ -144,51 +143,71 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        int rowNum;
         String where;
         switch (sUriMatcher.match(uri)) {
             case DEAL:
-                return db.delete(TDeals.TABLE, selection, selectionArgs);
+                rowNum = db.delete(TDeals.TABLE, selection, selectionArgs);
+                break;
             case DEAL_ROW:
                 where = SQLUtils.createWhere(TDeals._ID + "=" + uri.getLastPathSegment(), selection);
-                return db.delete(TDeals.TABLE, where, selectionArgs);
+                rowNum =  db.delete(TDeals.TABLE, where, selectionArgs);
+                break;
             case DAILY_DEAL:
                 where = SQLUtils.createWhere(TDeals.CATEGORY + "=" + TDeals.CAT_DAILY_DEAL, selection);
-                return db.delete(TDeals.TABLE, where, selectionArgs);
+                rowNum = db.delete(TDeals.TABLE, where, selectionArgs);
+                break;
             case SPOTLIGHT:
                 where = SQLUtils.createWhere(TDeals.CATEGORY + "=" + TDeals.CAT_SPOTLIGHT, selection);
-                return db.delete(TDeals.TABLE, where, selectionArgs);
+                rowNum = db.delete(TDeals.TABLE, where, selectionArgs);
+                break;
             case WEEK_LONG_DEAL:
                 where = SQLUtils.createWhere(TDeals.CATEGORY + "=" + TDeals.CAT_WEEK_LONG_DEAL, selection);
-                return db.delete(TDeals.TABLE, where, selectionArgs);
+                rowNum = db.delete(TDeals.TABLE, where, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+        if (rowNum > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowNum;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        int rowNum;
         String where;
         switch (sUriMatcher.match(uri)) {
             case DEAL:
-                return db.update(TDeals.TABLE, values, selection, selectionArgs);
+                rowNum = db.update(TDeals.TABLE, values, selection, selectionArgs);
+                break;
             case DEAL_ROW:
                 where = SQLUtils.createWhere(
                         TDeals._ID + "=" + uri.getLastPathSegment(), selection);
-                return db.update(TDeals.TABLE, values, where, selectionArgs);
+                rowNum = db.update(TDeals.TABLE, values, where, selectionArgs);
+                break;
             case DAILY_DEAL:
                 where = SQLUtils.createWhere(
                         TDeals.CATEGORY + "=" + TDeals.CAT_DAILY_DEAL, selection);
-                return db.update(TDeals.TABLE, values, where, selectionArgs);
+                rowNum = db.update(TDeals.TABLE, values, where, selectionArgs);
+                break;
             case SPOTLIGHT:
                 where = SQLUtils.createWhere(
                         TDeals.CATEGORY + "=" + TDeals.CAT_SPOTLIGHT, selection);
-                return db.update(TDeals.TABLE, values, where, selectionArgs);
+                rowNum = db.update(TDeals.TABLE, values, where, selectionArgs);
+                break;
             case WEEK_LONG_DEAL:
                 where = SQLUtils.createWhere(
                         TDeals.CATEGORY + "=" + TDeals.CAT_WEEK_LONG_DEAL, selection);
-                return db.update(TDeals.TABLE, values, where, selectionArgs);
+                rowNum = db.update(TDeals.TABLE, values, where, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+        if (rowNum > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowNum;
     }
 }

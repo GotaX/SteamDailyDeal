@@ -4,7 +4,9 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.gota.steamdailydeal.App;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
 import com.gota.steamdailydeal.entity.Deal;
@@ -42,13 +44,22 @@ public class SQLUtils {
     }
 
     public static void saveDeals(ContentResolver cr, List<Deal> deals) {
+        for (Deal deal : deals) {
+            Log.d(App.TAG, "Save deal: " + deal);
+        }
+
+        Uri dailyDeal = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DAILY_DEAL);
+        Uri spotlight = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_SPOTLIGHT);
+        Uri deal = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DEAL);
+
         ContentValues[] values = new ContentValues[deals.size()];
         for (int i = 0; i < values.length; i++) {
             values[i] = deals.get(i).getContentValues();
         }
 
-        Uri uri = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DEAL);
-        cr.bulkInsert(uri, values);
+        cr.delete(dailyDeal, null, null);
+        cr.delete(spotlight, null, null);
+        cr.bulkInsert(deal, values);
     }
 
 }

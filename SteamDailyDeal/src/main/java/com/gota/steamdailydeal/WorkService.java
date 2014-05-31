@@ -23,6 +23,7 @@ public class WorkService extends IntentService {
     private static final String ACTION_UPDATE_DATA = "com.gota.steamdailydeal.action.UPDATE_DATA";
 
     public static void startActionUpdateData(Context context) {
+        Log.d(App.TAG, "Start service!");
         Intent intent = new Intent(context, WorkService.class);
         intent.setAction(ACTION_UPDATE_DATA);
         context.startService(intent);
@@ -45,15 +46,19 @@ public class WorkService extends IntentService {
     }
 
     private void handleActionUpdateData() {
+        Log.d(App.TAG, "Handle update data action!");
         App.queue.add(new StringRequest(
                 Request.Method.GET,
                 StorefrontAPI.FEATURED_CATEGORIES,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
+                        Log.d(App.TAG, "Receive JSON string:\n" + s);
                         try {
                             List<Deal> deals = JSONUtils.parseDeal(s);
+                            Log.d(App.TAG, "JSON string parsed!");
                             SQLUtils.saveDeals(getContentResolver(), deals);
+                            Log.d(App.TAG, "JSON string saved to database");
                         } catch (JSONException e) {
                             Log.e(App.TAG, "Error on parse JSON!", e);
                         }

@@ -5,6 +5,7 @@ import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 
 import com.gota.steamdailydeal.App;
+import com.gota.steamdailydeal.data.Tables;
 
 import java.util.Currency;
 import java.util.Locale;
@@ -36,5 +37,18 @@ public class MyTextUtils {
 
     public static String getDiscount(String text) {
         return String.format("-%s%s", text, "%");
+    }
+
+    public static String getCategory(int category) {
+        switch (category) {
+            case Tables.TDeals.CAT_DAILY_DEAL:
+                return "每日特惠";
+            case Tables.TDeals.CAT_SPOTLIGHT:
+                return "今日焦点";
+            case Tables.TDeals.CAT_WEEK_LONG_DEAL:
+                return "周期特惠";
+            default:
+                return "未知类型";
+        }
     }
 }

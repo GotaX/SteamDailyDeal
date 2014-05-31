@@ -16,9 +16,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int DB_VERSION = 1;
 
     public static final String CREATE_DEALS =
-            "create table " + TDeals.TABLE+ " (" +
+            "create table " + TDeals.TABLE + " (" +
             TDeals._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            TDeals.ID + " INTEGER NOT NULL UNIQUE, " +
+            TDeals.ID + " INTEGER, " +
             TDeals.TYPE + " INTEGER, " +
             TDeals.NAME + " TEXT, " +
             TDeals.DISCOUNTED + " BOOLEAN, " +
