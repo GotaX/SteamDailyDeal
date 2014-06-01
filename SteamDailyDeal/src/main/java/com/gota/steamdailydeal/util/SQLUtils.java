@@ -4,9 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.gota.steamdailydeal.App;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
 import com.gota.steamdailydeal.entity.Deal;
@@ -18,6 +16,13 @@ import java.util.List;
  * Email: G.tianxiang@gmail.com
  */
 public class SQLUtils {
+
+    public static final Uri DAIL_DEAL = Uri.withAppendedPath(
+            DataProvider.CONTENT_URI, DataProvider.PATH_DAILY_DEAL);
+    public static final Uri SPOTLIGHT = Uri.withAppendedPath(
+            DataProvider.CONTENT_URI, DataProvider.PATH_SPOTLIGHT);
+    public static final Uri WEEK_LONG_DEAL = Uri.withAppendedPath(
+            DataProvider.CONTENT_URI, DataProvider.PATH_WEEK_LONG_DEAL);
 
     public static String createWhere(String where1, String where2) {
         if (TextUtils.isEmpty(where2)) {
@@ -44,21 +49,22 @@ public class SQLUtils {
     }
 
     public static void saveDeals(ContentResolver cr, List<Deal> deals) {
-        for (Deal deal : deals) {
-            Log.d(App.TAG, "Save deal: " + deal);
-        }
+        if (deals == null || deals.isEmpty()) return;
 
-        Uri dailyDeal = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DAILY_DEAL);
-        Uri spotlight = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_SPOTLIGHT);
         Uri deal = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DEAL);
 
         ContentValues[] values = new ContentValues[deals.size()];
         for (int i = 0; i < values.length; i++) {
             values[i] = deals.get(i).getContentValues();
         }
-
-        cr.delete(dailyDeal, null, null);
-        cr.delete(spotlight, null, null);
+        Deal first = deals.get(0);
+        if (first.category == Tables.TDeals.CAT_DAILY_DEAL ||
+            first.category == Tables.TDeals.CAT_SPOTLIGHT) {
+            cr.delete(DAIL_DEAL, null, null);
+            cr.delete(SPOTLIGHT, null, null);
+        } else if (first.category == Tables.TDeals.CAT_WEEK_LONG_DEAL) {
+            cr.delete(WEEK_LONG_DEAL, null, null);
+        }
         cr.bulkInsert(deal, values);
     }
 

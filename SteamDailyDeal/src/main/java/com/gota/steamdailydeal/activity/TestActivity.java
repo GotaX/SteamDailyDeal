@@ -82,7 +82,8 @@ public class TestActivity extends Activity
 
     public void btnTest(View view) {
         Log.d(App.TAG, "Button pressed");
-        WorkService.startActionUpdateData(this);
+//        WorkService.startActionUpdateData(this);
+        WorkService.startActionWeekLongDeal(this);
     }
 
 }

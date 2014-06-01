@@ -9,12 +9,40 @@ import com.gota.steamdailydeal.data.Tables;
 
 import java.util.Currency;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Gota on 2014/5/17.
  * Email: G.tianxiang@gmail.com
  */
 public class MyTextUtils {
+
+    private static final Pattern PATTERN_ID =
+            Pattern.compile("(?<=((app/)||(sub/)))(\\d+)");
+
+    public static int findAppType(String storeLink) {
+        if (storeLink.contains("/app/")) {
+            return 0;
+        } else if (storeLink.contains("/sub/")) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    public static String findAppId(String storeLink) {
+        Matcher matcher = PATTERN_ID.matcher(storeLink);
+        return matcher.find() ? matcher.group() : "";
+    }
+
+    public static int convertPrice(String price) {
+        return Integer.parseInt(price.replaceAll("[^\\d]", ""));
+    }
+
+    public static int convertPercent(String percent) {
+        return Integer.parseInt(percent.replaceAll("[^\\d]", ""));
+    }
 
     public static String getStoreLink(String id) {
         return String.format("https://store.steampowered.com/app/%s/", id);
