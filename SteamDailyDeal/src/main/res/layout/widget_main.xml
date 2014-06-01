@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="3dip"
-    android:background="@drawable/bg_header_img">
+    android:background="@drawable/bg_title">
 
     <TextView
         android:id="@+id/empty"
@@ -19,6 +19,7 @@
         android:id="@+id/vf_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_centerInParent="true"
         android:outAnimation="@anim/slide_in_left"
         android:inAnimation="@anim/slide_out_right"
         android:autoStart="true"

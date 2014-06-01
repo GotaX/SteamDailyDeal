@@ -8,4 +8,7 @@
         android:startColor="#283951"
         android:endColor="#101010"
         />
+    <stroke
+        android:width="3dp"
+        android:color="@color/bg_header_img" />
 </shape>
