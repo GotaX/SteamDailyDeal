@@ -59,6 +59,10 @@ public class WorkService extends IntentService {
                             Log.d(App.TAG, "JSON string parsed!");
                             SQLUtils.saveDeals(getContentResolver(), deals);
                             Log.d(App.TAG, "JSON string saved to database");
+                            Intent broadcast = new Intent(DailyDealWidget.ACTION_UPDATE_UI);
+                            broadcast.setClass(getApplicationContext(), DailyDealWidget.class);
+                            sendBroadcast(broadcast);
+                            Log.d(App.TAG, "Broadcast update UI");
                         } catch (JSONException e) {
                             Log.e(App.TAG, "Error on parse JSON!", e);
                         }

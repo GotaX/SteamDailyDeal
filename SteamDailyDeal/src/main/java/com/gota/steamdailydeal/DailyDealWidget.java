@@ -2,6 +2,7 @@ package com.gota.steamdailydeal;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,13 +15,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * Implementation of App Widget functionality.
  */
 public class DailyDealWidget extends AppWidgetProvider {
 
     public static final String ACTION_REFRESH = "com.gota.dailydeal.action_refresh";
+    public static final String ACTION_UPDATE_UI = "com.gota.dailydeal.action_update_ui";
 
     public static final String KEY_WIDGET_ID = "keyWidgetId";
     public static final String KEY_NEED_RETRY = "keyNeedRetry";
@@ -35,8 +36,20 @@ public class DailyDealWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        Log.d(App.TAG, "Receive broadcast: " + action);
         if (ACTION_REFRESH.equals(action)) {
             WorkService.startActionUpdateData(context);
+        } else if (ACTION_UPDATE_UI.equals(action)) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            ComponentName componentName = new ComponentName(context, DailyDealWidget.class);
+            int[] ids = appWidgetManager.getAppWidgetIds(componentName);
+            LayoutBuilder lb = new LayoutBuilder(context);
+            for (int id : ids) {
+                if (!mSizeMap.containsKey(id)) {
+                    mSizeMap.put(id, Size.MEDIUM);
+                }
+                buildLayout(lb, id);
+            }
         } else {
             super.onReceive(context, intent);
         }
@@ -45,7 +58,7 @@ public class DailyDealWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(App.TAG, "on update: " + Arrays.toString(appWidgetIds));
-        LayoutBuilder lb = new LayoutBuilder(context, appWidgetManager);
+        LayoutBuilder lb = new LayoutBuilder(context);
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = lb.buildMediumLayout(appWidgetId);
             if (views == null) continue;
@@ -55,15 +68,15 @@ public class DailyDealWidget extends AppWidgetProvider {
     }
 
     @Override
-    public void onDeleted(Context context, int[] appWidgetIds) {
-        // When the user deletes the widget, delete the preference associated with it.
-        Log.d(App.TAG, "on deleted");
-    }
-
-    @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
         Log.d(App.TAG, "on enabled");
+    }
+
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+        // When the user deletes the widget, delete the preference associated with it.
+        Log.d(App.TAG, "on deleted");
     }
 
     @Override
@@ -88,7 +101,7 @@ public class DailyDealWidget extends AppWidgetProvider {
         Size screenSize;
         if (cell <= 1) {
             screenSize = Size.SMALL;
-        } else if (cell == 2) {
+        } else if (cell <= 3) {
             screenSize = Size.MEDIUM;
         } else {
             screenSize = Size.LARGE;
@@ -100,7 +113,7 @@ public class DailyDealWidget extends AppWidgetProvider {
                 appWidgetId, minWidth, maxWidth, minHeight, maxHeight));
         Log.d(App.TAG, "screen size: " + screenSize);
 
-        LayoutBuilder layoutBuilder = new LayoutBuilder(context, appWidgetManager);
+        LayoutBuilder layoutBuilder = new LayoutBuilder(context);
         RemoteViews views = buildLayout(layoutBuilder, appWidgetId);
         if (views != null) {
             appWidgetManager.updateAppWidget(appWidgetId, views);

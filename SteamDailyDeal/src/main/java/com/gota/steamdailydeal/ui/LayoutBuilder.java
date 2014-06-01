@@ -30,9 +30,9 @@ public class LayoutBuilder {
     private Context mContext;
     private AppWidgetManager mAppWidgetManager;
 
-    public LayoutBuilder(Context context, AppWidgetManager appWidgetManager) {
+    public LayoutBuilder(Context context) {
         this.mContext = context;
-        this.mAppWidgetManager = appWidgetManager;
+        this.mAppWidgetManager = AppWidgetManager.getInstance(context);
     }
 
     public RemoteViews buildSmallLayout(final int appWidgetId) {
