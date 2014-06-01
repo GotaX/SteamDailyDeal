@@ -103,6 +103,9 @@ public class LayoutBuilder {
         PendingIntent pi = PendingIntent.getActivity(
                 mContext, 0, ivf, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.vf_main, pi);
+
+        mAppWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.vf_main);
+
         return views;
     }
 

@@ -12,11 +12,15 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
 import com.gota.steamdailydeal.util.MyTextUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Gota on 2014/5/20.
@@ -33,6 +37,7 @@ public class MyWidgetService extends RemoteViewsService {
 
         private static Bitmap sPicNotFound;
 
+        private AppWidgetManager mAppWidgetManager;
         private String mPackageName;
         private int mAppWidgetId;
         private Cursor mCursor;
@@ -40,6 +45,7 @@ public class MyWidgetService extends RemoteViewsService {
 
         public FlipperRemoteViewsFactory(Context context, Intent intent) {
             this.mContext = context;
+            this.mAppWidgetManager = AppWidgetManager.getInstance(context);
             sPicNotFound = BitmapFactory.decodeResource(
                     mContext.getResources(), R.drawable.not_found);
             mAppWidgetId = intent.getIntExtra(
@@ -49,17 +55,36 @@ public class MyWidgetService extends RemoteViewsService {
 
         @Override
         public void onCreate() {
-            this.mPackageName = App.instance.getPackageName();
+            this.mPackageName = mContext.getPackageName();
         }
 
         @Override
         public void onDataSetChanged() {
             Log.d(App.TAG, "service data set changed!");
+
+            // Close old cursor, and query new
             if (mCursor != null) {
                 mCursor.close();
             }
             Uri uri = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DEAL);
-            mCursor = mContext.getContentResolver().query(uri, null, null, null, null);
+            String where = String.format("%s in (%s, %s)",
+                    Tables.TDeals.CATEGORY,
+                    Tables.TDeals.CAT_DAILY_DEAL,
+                    Tables.TDeals.CAT_SPOTLIGHT);
+            mCursor = mContext.getContentResolver().query(uri, null, where, null, null);
+
+            // Download image and cache it
+            CountDownLatch countDown = new CountDownLatch(mCursor.getCount());
+            while (mCursor.moveToNext()) {
+                String imageUrl = mCursor.getString(
+                        mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
+                loadImageToCache(countDown, imageUrl);
+            }
+            try {
+                countDown.await();
+            } catch (InterruptedException e) {
+                Log.e(App.TAG, "Interrupted when load image to cache!", e);
+            }
         }
 
         @Override
@@ -118,9 +143,9 @@ public class MyWidgetService extends RemoteViewsService {
             CharSequence sPrice = MyTextUtils.getCurrency(price, currency);
             CharSequence sDiscountPercent = MyTextUtils.getDiscount(discountPercent);
             String url = MyTextUtils.getStoreLink(appId);
-            Bitmap bitmapHeader = getNetImage(imgHeader);
 
-            views.setImageViewBitmap(R.id.img_header, bitmapHeader);
+            loadNetImage(views, imgHeader);
+
             views.setTextViewText(R.id.tv_name, name);
             views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
             views.setTextViewText(R.id.tv_price, sPrice);
@@ -134,7 +159,7 @@ public class MyWidgetService extends RemoteViewsService {
 
         private RemoteViews setupSpotLightView() {
             Log.d(App.TAG, "Setup view spotlight");
-            RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
+            final RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
 
             String imgHeader = mCursor.getString(
                     mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
@@ -144,9 +169,8 @@ public class MyWidgetService extends RemoteViewsService {
                     mCursor.getColumnIndex(Tables.TDeals.BODY));
             String url = mCursor.getString(
                     mCursor.getColumnIndex(Tables.TDeals.URL));
-            Bitmap bitmapHeader = getNetImage(imgHeader);
 
-            views.setImageViewBitmap(R.id.img_header, bitmapHeader);
+            loadNetImage(views, imgHeader);
             views.setTextViewText(R.id.tv_name, name);
             views.setViewVisibility(R.id.area_price, View.GONE);
 
@@ -176,16 +200,40 @@ public class MyWidgetService extends RemoteViewsService {
             return true;
         }
 
-        private Bitmap getNetImage(String url) {
-            RequestFuture<Bitmap> future = RequestFuture.newFuture();
-            ImageRequest imageRequest = new ImageRequest(
-                    url, future, 400, 400, Bitmap.Config.ALPHA_8, future);
-            App.queue.add(imageRequest);
-            try {
-                return future.get();
-            } catch (Exception e) {
-                return sPicNotFound;
+        private void loadNetImage(RemoteViews views, String url) {
+            Bitmap bitmap = App.cache.getBitmap(url);
+            if (bitmap == null) {
+                views.setImageViewResource(R.id.img_header, R.drawable.not_found);
+            } else {
+                views.setImageViewBitmap(R.id.img_header, bitmap);
             }
+        }
+
+        private void loadImageToCache(final CountDownLatch latch, final String url) {
+            if (App.cache.isCached(url)) {
+                Log.d(App.TAG, "Image cached: " + url);
+                return;
+            }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Log.d(App.TAG, "Start download image: " + url);
+                        URLConnection connection = new URL(url).openConnection();
+                        InputStream in = connection.getInputStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(in);
+                        in.close();
+
+                        Log.d(App.TAG, "Add image to cache!" + url);
+                        App.cache.putBitmap(url, bitmap);
+                    } catch (IOException e) {
+                        Log.e(App.TAG, "Error on download image!", e);
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            }).start();
         }
     }
 }

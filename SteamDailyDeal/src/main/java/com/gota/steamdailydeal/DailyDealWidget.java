@@ -109,6 +109,7 @@ public class DailyDealWidget extends AppWidgetProvider {
 
     private RemoteViews buildLayout(LayoutBuilder layoutBuilder, int appWidgetId) {
         Size screenSize = mSizeMap.get(appWidgetId);
+        Log.d(App.TAG, "Build " + screenSize + " layout!");
         if (screenSize == null) {
             return null;
         } else switch (screenSize) {

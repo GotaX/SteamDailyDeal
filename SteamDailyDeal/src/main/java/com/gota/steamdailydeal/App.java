@@ -34,6 +34,7 @@ public class App extends Application {
 
     public static RequestQueue queue;
     public static ImageLoader imgLoader;
+    public static BitmapCache cache;
     public static App instance;
     public static Gson gson;
     public static SharedPreferences prefs;
@@ -44,7 +45,8 @@ public class App extends Application {
         instance = this;
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         queue = Volley.newRequestQueue(this);
-        imgLoader = new ImageLoader(queue, new BitmapCache());
+        cache = new BitmapCache();
+        imgLoader = new ImageLoader(queue, cache);
 
         gson = new GsonBuilder()
                 .registerTypeAdapter(FeaturedCategories.class, new FeaturedCategoriesDeserializer())

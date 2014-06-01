@@ -10,6 +10,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.gota.steamdailydeal.App;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 /**
  * Created by Gota on 2014/5/17.
@@ -56,5 +57,10 @@ public class BitmapCache implements ImageLoader.ImageCache {
             entry.data = baos.toByteArray();
             mDiskCache.put(url, entry);
         }
+    }
+
+    public boolean isCached(String url) {
+        File file = mDiskCache.getFileForKey(url);
+        return file.exists();
     }
 }
