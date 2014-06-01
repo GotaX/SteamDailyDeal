@@ -15,18 +15,15 @@ import android.widget.RemoteViewsService;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
 import com.gota.steamdailydeal.util.MyTextUtils;
+import com.gota.steamdailydeal.util.NetUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Gota on 2014/5/20.
  * Email: G.tianxiang@gmail.com
  */
-public class MyWidgetService extends RemoteViewsService {
+public class SpotlightWidgetService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
@@ -78,7 +75,7 @@ public class MyWidgetService extends RemoteViewsService {
             while (mCursor.moveToNext()) {
                 String imageUrl = mCursor.getString(
                         mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
-                loadImageToCache(countDown, imageUrl);
+                NetUtils.loadImageToCache(countDown, imageUrl);
             }
             try {
                 countDown.await();
@@ -101,12 +98,9 @@ public class MyWidgetService extends RemoteViewsService {
 
         @Override
         public RemoteViews getViewAt(int position) {
-            Log.d(App.TAG, "Get view at " + position);
-
             mCursor.moveToPosition(position);
 
-            int categoryIndex = mCursor.getColumnIndex(Tables.TDeals.CATEGORY);
-            int category = mCursor.getInt(categoryIndex);
+            int category = mCursor.getInt(mCursor.getColumnIndex(Tables.TDeals.CATEGORY));
 
             switch (category) {
                 case Tables.TDeals.CAT_DAILY_DEAL:
@@ -119,7 +113,7 @@ public class MyWidgetService extends RemoteViewsService {
         }
 
         private RemoteViews setupDailyDealView() {
-            RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
+            RemoteViews views = new RemoteViews(mPackageName, R.layout.deal_item);
 
             Log.d(App.TAG, "Setup view daily deal");
             String imgHeader = mCursor.getString(
@@ -130,7 +124,7 @@ public class MyWidgetService extends RemoteViewsService {
                     mCursor.getColumnIndex(Tables.TDeals.ORIGINAL_PRICE));
             int price = mCursor.getInt(
                     mCursor.getColumnIndex(Tables.TDeals.FINAL_PRICE));
-            String appId = mCursor.getString(
+            int appId = mCursor.getInt(
                     mCursor.getColumnIndex(Tables.TDeals.ID));
             String currency = mCursor.getString(
                     mCursor.getColumnIndex(Tables.TDeals.CURRENCY));
@@ -144,7 +138,7 @@ public class MyWidgetService extends RemoteViewsService {
             CharSequence sDiscountPercent = MyTextUtils.getDiscount(discountPercent);
             String url = MyTextUtils.getStoreLink(appId);
 
-            loadNetImage(views, imgHeader);
+            NetUtils.loadNetImage(views, imgHeader);
 
             views.setTextViewText(R.id.tv_name, name);
             views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
@@ -159,7 +153,7 @@ public class MyWidgetService extends RemoteViewsService {
 
         private RemoteViews setupSpotLightView() {
             Log.d(App.TAG, "Setup view spotlight");
-            final RemoteViews views = new RemoteViews(mPackageName, R.layout.flip_item);
+            final RemoteViews views = new RemoteViews(mPackageName, R.layout.deal_item);
 
             String imgHeader = mCursor.getString(
                     mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
@@ -170,7 +164,7 @@ public class MyWidgetService extends RemoteViewsService {
             String url = mCursor.getString(
                     mCursor.getColumnIndex(Tables.TDeals.URL));
 
-            loadNetImage(views, imgHeader);
+            NetUtils.loadNetImage(views, imgHeader);
             views.setTextViewText(R.id.tv_name, name);
             views.setViewVisibility(R.id.area_price, View.GONE);
 
@@ -200,40 +194,5 @@ public class MyWidgetService extends RemoteViewsService {
             return true;
         }
 
-        private void loadNetImage(RemoteViews views, String url) {
-            Bitmap bitmap = App.cache.getBitmap(url);
-            if (bitmap == null) {
-                views.setImageViewResource(R.id.img_header, R.drawable.not_found);
-            } else {
-                views.setImageViewBitmap(R.id.img_header, bitmap);
-            }
-        }
-
-        private void loadImageToCache(final CountDownLatch latch, final String url) {
-            if (App.cache.isCached(url)) {
-                Log.d(App.TAG, "Image cached: " + url);
-                return;
-            }
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Log.d(App.TAG, "Start download image: " + url);
-                        URLConnection connection = new URL(url).openConnection();
-                        InputStream in = connection.getInputStream();
-                        Bitmap bitmap = BitmapFactory.decodeStream(in);
-                        in.close();
-
-                        Log.d(App.TAG, "Add image to cache!" + url);
-                        App.cache.putBitmap(url, bitmap);
-                    } catch (IOException e) {
-                        Log.e(App.TAG, "Error on download image!", e);
-                    } finally {
-                        latch.countDown();
-                    }
-                }
-            }).start();
-        }
     }
 }

@@ -10,7 +10,7 @@ public class Tables {
 
     public static interface SQL {
         String[] PROJECTION_DAILY_DEAL_SMALL = {
-                TDeals._ID, TDeals.ID, TDeals.CURRENCY, TDeals.ORIGINAL_PRICE,
+                TDeals._ID, TDeals.ID, TDeals.TYPE, TDeals.CURRENCY, TDeals.ORIGINAL_PRICE,
                 TDeals.FINAL_PRICE, TDeals.DISCOUNT_PERCENT, TDeals.NAME
         };
         String[] PROJECTION_DAILY_DEAL = {
@@ -24,7 +24,8 @@ public class Tables {
                 TDeals.URL
         };
         String[] PROJECTION_WEEK_LONG = {
-                // TODO: Write week long projection
+                TDeals._ID, TDeals.ID, TDeals.TYPE, TDeals.CURRENCY, TDeals.ORIGINAL_PRICE,
+                TDeals.FINAL_PRICE, TDeals.DISCOUNT_PERCENT, TDeals.NAME
         };
     }
 

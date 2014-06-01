@@ -41,7 +41,7 @@ public class TestActivity extends Activity
 
         lv = (ListView) findViewById(android.R.id.list);
         mAdapter = new SimpleCursorAdapter(this,
-                R.layout.deal_item, null, from, to,
+                R.layout.demo_deal_list_item, null, from, to,
                 CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
         mAdapter.getViewBinder();
         mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {

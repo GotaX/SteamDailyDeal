@@ -6,20 +6,31 @@ package com.gota.steamdailydeal.constants;
  */
 public class Steam implements SteamAPI {
 
-    public static String getStoreLink(int id) {
-       return String.format(STORE_LINK, id);
+    public static String getStoreLink(int type, int id) {
+       return String.format(STORE_LINK, getTypeStr(type), id);
     }
 
-    public static String getLargePic(int id) {
-        return String.format(CAPSULE_LARGE, id);
+    public static String getLargePic(int type, int id) {
+        return String.format(CAPSULE_LARGE, getTypeStr(type) + "s", id);
     }
 
-    public static String getMediumPic(int id) {
-        return String.format(CAPSULE_MEDIUM, id);
+    public static String getMediumPic(int type, int id) {
+        return String.format(CAPSULE_MEDIUM, getTypeStr(type) + "s", id);
     }
 
-    public static String getSmallPic(int id) {
-        return String.format(CAPSULE_SMALL, id);
+    public static String getSmallPic(int type, int id) {
+        return String.format(CAPSULE_SMALL, getTypeStr(type) + "s", id);
+    }
+
+    public static String getTypeStr(int type) {
+        switch (type) {
+            case TYPE_APP:
+                return "app";
+            case TYPE_SUB:
+                return "sub";
+            default:
+                return "";
+        }
     }
 
 }

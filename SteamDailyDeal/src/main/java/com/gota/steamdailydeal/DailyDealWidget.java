@@ -39,6 +39,7 @@ public class DailyDealWidget extends AppWidgetProvider {
         Log.d(App.TAG, "Receive broadcast: " + action);
         if (ACTION_REFRESH.equals(action)) {
             WorkService.startActionUpdateData(context);
+            WorkService.startActionWeekLongDeal(context);
         } else if (ACTION_UPDATE_UI.equals(action)) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             ComponentName componentName = new ComponentName(context, DailyDealWidget.class);
@@ -46,7 +47,7 @@ public class DailyDealWidget extends AppWidgetProvider {
             LayoutBuilder lb = new LayoutBuilder(context);
             for (int id : ids) {
                 if (!mSizeMap.containsKey(id)) {
-                    mSizeMap.put(id, Size.MEDIUM);
+                    mSizeMap.put(id, Size.SMALL);
                 }
                 buildLayout(lb, id);
             }

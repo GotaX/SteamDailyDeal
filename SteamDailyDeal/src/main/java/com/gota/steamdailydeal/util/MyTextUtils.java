@@ -5,6 +5,7 @@ import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 
 import com.gota.steamdailydeal.App;
+import com.gota.steamdailydeal.constants.Steam;
 import com.gota.steamdailydeal.data.Tables;
 
 import java.util.Currency;
@@ -23,9 +24,9 @@ public class MyTextUtils {
 
     public static int findAppType(String storeLink) {
         if (storeLink.contains("/app/")) {
-            return 0;
+            return Steam.TYPE_APP;
         } else if (storeLink.contains("/sub/")) {
-            return 1;
+            return Steam.TYPE_SUB;
         } else {
             return -1;
         }
@@ -44,7 +45,7 @@ public class MyTextUtils {
         return Integer.parseInt(percent.replaceAll("[^\\d]", ""));
     }
 
-    public static String getStoreLink(String id) {
+    public static String getStoreLink(int id) {
         return String.format("https://store.steampowered.com/app/%s/", id);
     }
 

@@ -12,5 +12,6 @@
     <string name="no_data">No Data</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="btn_test">Test</string>
+    <string name="loading">Loading...</string>
 
 </resources>

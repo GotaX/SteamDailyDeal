@@ -74,12 +74,12 @@ public class DataProvider extends ContentProvider {
                 break;
             case SPOTLIGHT:
                 builder.setTables(TDeals.TABLE);
-                builder.appendWhere(TDeals.TYPE + "=" + TDeals.CAT_SPOTLIGHT);
+                builder.appendWhere(TDeals.CATEGORY + "=" + TDeals.CAT_SPOTLIGHT);
                 defaultProjection = SQL.PROJECTION_SPOTLIGHT;
                 break;
             case WEEK_LONG_DEAL:
                 builder.setTables(TDeals.TABLE);
-                builder.appendWhere(TDeals.TYPE + "=" + TDeals.CAT_WEEK_LONG_DEAL);
+                builder.appendWhere(TDeals.CATEGORY + "=" + TDeals.CAT_WEEK_LONG_DEAL);
                 defaultProjection = SQL.PROJECTION_WEEK_LONG;
                 break;
             default:
