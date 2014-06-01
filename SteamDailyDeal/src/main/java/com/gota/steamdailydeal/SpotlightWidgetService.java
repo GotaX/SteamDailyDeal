@@ -138,7 +138,7 @@ public class SpotlightWidgetService extends RemoteViewsService {
             CharSequence sDiscountPercent = MyTextUtils.getDiscount(discountPercent);
             String url = MyTextUtils.getStoreLink(appId);
 
-            NetUtils.loadNetImage(views, imgHeader);
+            NetUtils.loadImageFromCache(views, imgHeader);
 
             views.setTextViewText(R.id.tv_name, name);
             views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
@@ -164,7 +164,7 @@ public class SpotlightWidgetService extends RemoteViewsService {
             String url = mCursor.getString(
                     mCursor.getColumnIndex(Tables.TDeals.URL));
 
-            NetUtils.loadNetImage(views, imgHeader);
+            NetUtils.loadImageFromCache(views, imgHeader);
             views.setTextViewText(R.id.tv_name, name);
             views.setViewVisibility(R.id.area_price, View.GONE);
 

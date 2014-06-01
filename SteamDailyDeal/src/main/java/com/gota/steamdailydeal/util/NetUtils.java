@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class NetUtils {
 
-    public static void loadNetImage(RemoteViews views, String url) {
+    public static void loadImageFromCache(RemoteViews views, String url) {
         Bitmap bitmap = App.cache.getBitmap(url);
         if (bitmap == null) {
             views.setImageViewResource(R.id.img_header, R.drawable.not_found);
@@ -32,6 +32,7 @@ public class NetUtils {
     public static void loadImageToCache(final CountDownLatch latch, final String url) {
         if (App.cache.isCached(url)) {
             Log.d(App.TAG, "Image cached: " + url);
+            latch.countDown();
             return;
         }
 

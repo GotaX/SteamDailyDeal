@@ -72,6 +72,7 @@ public class WeekLongDealsWidgetService extends RemoteViewsService {
             }
             try {
                 countDown.await();
+                Log.d(App.TAG, "Loaded " + mCursor.getCount() + " images to cache!");
             } catch (InterruptedException e) {
                 Log.e(App.TAG, "Interrupted when load image to cache!", e);
             }
@@ -117,7 +118,7 @@ public class WeekLongDealsWidgetService extends RemoteViewsService {
 
             RemoteViews views = new RemoteViews(mPackageName, R.layout.week_long_deal_item);
 
-            NetUtils.loadNetImage(views, imgHeader);
+            NetUtils.loadImageFromCache(views, imgHeader);
             views.setTextViewText(R.id.tv_name, name);
             views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
             views.setTextViewText(R.id.tv_price, sPrice);

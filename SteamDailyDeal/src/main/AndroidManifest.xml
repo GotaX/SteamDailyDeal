@@ -49,6 +49,7 @@
             </intent-filter>
         </activity>
 
+        <!--
         <activity
             android:name=".activity.TestActivity"
             android:label="@string/title_activity_test" >
@@ -57,6 +58,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        -->
     </application>
 
 </manifest>
