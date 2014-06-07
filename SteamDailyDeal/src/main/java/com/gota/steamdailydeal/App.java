@@ -100,8 +100,6 @@ public class App extends Application {
     private PendingIntent createRefreshPendingIntent() {
         Intent updateIntent = new Intent(this, DailyDealWidget.class);
         updateIntent.setAction(DailyDealWidget.ACTION_REFRESH);
-        updateIntent.putExtra(DailyDealWidget.KEY_NEED_RETRY, true);
-        updateIntent.putExtra(DailyDealWidget.KEY_FORCE_REFRESH, false);
         updateIntent.putExtra("alarm", true);
         return PendingIntent.getBroadcast(this, 1, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }

@@ -48,8 +48,6 @@ public class ConfigurationActivity extends ActionBarActivity {
         Intent refreshIntent = new Intent(this, DailyDealWidget.class);
         refreshIntent.setAction(DailyDealWidget.ACTION_REFRESH);
         refreshIntent.putExtra(DailyDealWidget.KEY_WIDGET_ID, mAppWidgetId);
-        refreshIntent.putExtra(DailyDealWidget.KEY_NEED_RETRY, true);
-        refreshIntent.putExtra(DailyDealWidget.KEY_FORCE_REFRESH, true);
         sendBroadcast(refreshIntent);
 
         Log.d(TAG, "Finish");

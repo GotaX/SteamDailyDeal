@@ -26,8 +26,6 @@ public class DailyDealWidget extends AppWidgetProvider {
     public static final String ACTION_UPDATE_UI = "com.gota.dailydeal.action_update_ui";
 
     public static final String KEY_WIDGET_ID = "keyWidgetId";
-    public static final String KEY_NEED_RETRY = "keyNeedRetry";
-    public static final String KEY_FORCE_REFRESH = "keyForceRefresh";
 
     public static enum Size {
         SMALL, MEDIUM, LARGE
@@ -85,7 +83,6 @@ public class DailyDealWidget extends AppWidgetProvider {
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
         Log.d(App.TAG, "on disabled");
-        WorkService.instance.stopSelf();
         App.queue.stop();
         App.instance.cancelAlarm();
         App.prefs.edit().clear().commit();

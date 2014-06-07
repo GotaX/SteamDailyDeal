@@ -28,35 +28,39 @@ import java.util.concurrent.ExecutionException;
 
 public class WorkService extends IntentService {
 
-    public static WorkService instance;
-
     private static final String ACTION_UPDATE_DAILY_DEAL_AND_SPOTLIGHT =
             "com.gota.steamdailydeal.action.update_daily_deal_and_spotlight";
     private static final String ACTION_WEEK_LONG_DEAL =
             "com.gota.steamdailydeal.action.update_week_long_deal";
 
     private static final int NOTIFICATION_ID = 0x26;
+    private static int sTaskCount = 0;
 
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mManager;
 
     public static void startActionUpdateData(Context context) {
         Log.d(App.TAG, "Start service!");
-        Intent intent = new Intent(context, WorkService.class);
-        intent.setAction(ACTION_UPDATE_DAILY_DEAL_AND_SPOTLIGHT);
-        context.startService(intent);
+        startAction(context, ACTION_UPDATE_DAILY_DEAL_AND_SPOTLIGHT);
     }
 
     public static void startActionWeekLongDeal(Context context) {
         Log.d(App.TAG, "Start service!");
+        startAction(context, ACTION_WEEK_LONG_DEAL);
+    }
+
+    private static void startAction(Context context, String action) {
+        // Running task no more than 3
+        if (sTaskCount >= 3) return;
+
+        sTaskCount++;
         Intent intent = new Intent(context, WorkService.class);
-        intent.setAction(ACTION_WEEK_LONG_DEAL);
+        intent.setAction(action);
         context.startService(intent);
     }
 
     public WorkService() {
         super("WorkService");
-        instance = this;
     }
 
     @Override
@@ -73,16 +77,20 @@ public class WorkService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            switch (action) {
-                case ACTION_UPDATE_DAILY_DEAL_AND_SPOTLIGHT:
-                    handleActionUpdateDailDealAndSpotlight();
-                    break;
-                case ACTION_WEEK_LONG_DEAL:
-                    handleActionWeekLongDeal();
-                    break;
+        try {
+            if (intent != null) {
+                final String action = intent.getAction();
+                switch (action) {
+                    case ACTION_UPDATE_DAILY_DEAL_AND_SPOTLIGHT:
+                        handleActionUpdateDailDealAndSpotlight();
+                        break;
+                    case ACTION_WEEK_LONG_DEAL:
+                        handleActionWeekLongDeal();
+                        break;
+                }
             }
+        } finally {
+            sTaskCount --;
         }
     }
 
