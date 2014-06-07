@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.gota.steamdailydeal.ui.LayoutBuilder;
+import com.gota.steamdailydeal.util.UIUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class DailyDealWidget extends AppWidgetProvider {
     public static final String KEY_NEED_RETRY = "keyNeedRetry";
     public static final String KEY_FORCE_REFRESH = "keyForceRefresh";
 
-    enum Size {
+    public static enum Size {
         SMALL, MEDIUM, LARGE
     }
 
@@ -98,31 +99,19 @@ public class DailyDealWidget extends AppWidgetProvider {
         int minHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
         int maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
 
-        int cell = (minHeight + 2) / 72;
-
-        Size screenSize;
-        if (cell <= 1) {
-            screenSize = Size.SMALL;
-        } else if (cell <= 3) {
-            screenSize = Size.MEDIUM;
-        } else {
-            screenSize = Size.LARGE;
-        }
-        sSizeMap.put(appWidgetId, screenSize);
-        App.prefs.edit()
-            .putInt(getSizeKey(appWidgetId), screenSize.ordinal())
-            .commit();
-
-        if (App.DEBUG) Log.d(App.TAG, String.format(
+        if (App.DEBUG) {
+            Log.d(App.TAG, String.format(
                 "app_id: %s [minWidth=%s, maxWidth=%s, minHeight=%s, maxHeight=%s]",
                 appWidgetId, minWidth, maxWidth, minHeight, maxHeight));
-        Log.d(App.TAG, "screen size: " + screenSize);
-
-        LayoutBuilder layoutBuilder = new LayoutBuilder(context);
-        RemoteViews views = buildLayout(layoutBuilder, appWidgetId);
-        if (views != null) {
-            appWidgetManager.updateAppWidget(appWidgetId, views);
         }
+
+        Size oldSize = sSizeMap.get(appWidgetId);
+        Size screenSize = UIUtils.calculateSize(minHeight);
+        if (oldSize == screenSize) return;
+
+        sSizeMap.put(appWidgetId, screenSize);
+        App.prefs.edit().putInt(getSizeKey(appWidgetId), screenSize.ordinal()).commit();
+        updateUI(context, new int[]{appWidgetId}, appWidgetManager);
     }
 
     private void updateUI(Context context, int[] ids, AppWidgetManager appWidgetManager) {

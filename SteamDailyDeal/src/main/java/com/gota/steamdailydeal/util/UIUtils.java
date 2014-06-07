@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.gota.steamdailydeal.App;
+import com.gota.steamdailydeal.DailyDealWidget;
 import com.gota.steamdailydeal.R;
 import com.gota.steamdailydeal.constants.Steam;
 import com.gota.steamdailydeal.data.Tables;
@@ -51,5 +52,16 @@ public class UIUtils {
         views.setImageViewBitmap(R.id.img_header, bitmap);
         views.setTextViewText(R.id.tv_name, name);
         views.setViewVisibility(R.id.area_price, View.GONE);
+    }
+
+    public static DailyDealWidget.Size calculateSize(int height) {
+        int cell = (height + 2) / 72;
+        if (cell <= 1) {
+            return DailyDealWidget.Size.SMALL;
+        } else if (cell <= 3) {
+            return DailyDealWidget.Size.MEDIUM;
+        } else {
+            return DailyDealWidget.Size.LARGE;
+        }
     }
 }
