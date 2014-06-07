@@ -11,7 +11,7 @@ public class Tables {
     public static interface SQL {
         String[] PROJECTION_DAILY_DEAL_SMALL = {
                 TDeals._ID, TDeals.ID, TDeals.TYPE, TDeals.CURRENCY, TDeals.ORIGINAL_PRICE,
-                TDeals.FINAL_PRICE, TDeals.DISCOUNT_PERCENT, TDeals.NAME
+                TDeals.FINAL_PRICE, TDeals.DISCOUNT_PERCENT, TDeals.NAME, TDeals.HEADER_IMAGE
         };
         String[] PROJECTION_DAILY_DEAL = {
                 TDeals._ID, TDeals.ID, TDeals.TYPE, TDeals.DISCOUNTED,

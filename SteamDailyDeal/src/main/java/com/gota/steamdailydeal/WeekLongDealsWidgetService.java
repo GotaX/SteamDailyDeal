@@ -66,7 +66,6 @@ public class WeekLongDealsWidgetService extends RemoteViewsService {
 
         @Override
         public RemoteViews getViewAt(int position) {
-            Log.d(App.TAG, "Week long deal item "+ position);
             mCursor.moveToPosition(position);
 
             RemoteViews views = new RemoteViews(mPackageName, R.layout.week_long_deal_item);

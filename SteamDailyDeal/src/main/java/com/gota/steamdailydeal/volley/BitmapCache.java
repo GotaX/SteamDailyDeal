@@ -39,11 +39,11 @@ public class BitmapCache implements ImageLoader.ImageCache {
         if (bitmap != null) return bitmap;
 
         Cache.Entry entry = mDiskCache.get(url);
-        if (entry != null) {
-            return BitmapFactory.decodeByteArray(entry.data, 0, entry.data.length);
-        }
+        if (entry == null) return null;
 
-        return null;
+        bitmap = BitmapFactory.decodeByteArray(entry.data, 0, entry.data.length);
+        mCache.put(url, bitmap);
+        return bitmap;
     }
 
     @Override

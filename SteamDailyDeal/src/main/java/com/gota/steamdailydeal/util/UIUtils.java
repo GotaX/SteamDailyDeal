@@ -36,7 +36,6 @@ public class UIUtils {
                 Steam.getMediumPic(type, id) :
                 cursor.getString(colImage);
         Bitmap bitmap = App.cache.getBitmap(headerImage);
-
         views.setImageViewBitmap(R.id.img_header, bitmap);
         views.setTextViewText(R.id.tv_name, name);
         views.setTextViewText(R.id.tv_discount_percent, discountPercent);

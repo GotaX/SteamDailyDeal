@@ -48,16 +48,7 @@ public class DailyDealWidget extends AppWidgetProvider {
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
                 ComponentName componentName = new ComponentName(context, DailyDealWidget.class);
                 int[] ids = appWidgetManager.getAppWidgetIds(componentName);
-
-                LayoutBuilder lb = new LayoutBuilder(context);
-                for (int id : ids) {
-                    if (!sSizeMap.containsKey(id)) {
-                        int ordinal = App.prefs.getInt(getSizeKey(id), Size.SMALL.ordinal());
-                        sSizeMap.put(id, Size.values()[ordinal]);
-                    }
-                    RemoteViews views = buildLayout(lb, id);
-                    appWidgetManager.updateAppWidget(id, views);
-                }
+                updateUI(context, ids, appWidgetManager);
                 break;
             default:
                 super.onReceive(context, intent);
@@ -68,6 +59,7 @@ public class DailyDealWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(App.TAG, "on update: " + Arrays.toString(appWidgetIds));
+        updateUI(context, appWidgetIds, appWidgetManager);
     }
 
     @Override
@@ -92,6 +84,7 @@ public class DailyDealWidget extends AppWidgetProvider {
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
         Log.d(App.TAG, "on disabled");
+        WorkService.instance.stopSelf();
         App.queue.stop();
         App.instance.cancelAlarm();
         App.prefs.edit().clear().commit();
@@ -129,6 +122,18 @@ public class DailyDealWidget extends AppWidgetProvider {
         RemoteViews views = buildLayout(layoutBuilder, appWidgetId);
         if (views != null) {
             appWidgetManager.updateAppWidget(appWidgetId, views);
+        }
+    }
+
+    private void updateUI(Context context, int[] ids, AppWidgetManager appWidgetManager) {
+        LayoutBuilder lb = new LayoutBuilder(context);
+        for (int id : ids) {
+            if (!sSizeMap.containsKey(id)) {
+                int ordinal = App.prefs.getInt(getSizeKey(id), Size.SMALL.ordinal());
+                sSizeMap.put(id, Size.values()[ordinal]);
+            }
+            RemoteViews views = buildLayout(lb, id);
+            appWidgetManager.updateAppWidget(id, views);
         }
     }
 
