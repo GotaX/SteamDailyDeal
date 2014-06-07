@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.gota.steamdailydeal.constants.Pref;
 import com.gota.steamdailydeal.ui.LayoutBuilder;
 import com.gota.steamdailydeal.util.UIUtils;
 
@@ -74,7 +75,7 @@ public class DailyDealWidget extends AppWidgetProvider {
         SharedPreferences.Editor editor = App.prefs.edit();
         for (int id : appWidgetIds) {
             sSizeMap.remove(id);
-            editor.remove(getSizeKey(id));
+            editor.remove(Pref.getSizeKey(id));
         }
         editor.commit();
     }
@@ -107,7 +108,7 @@ public class DailyDealWidget extends AppWidgetProvider {
         if (oldSize == screenSize) return;
 
         sSizeMap.put(appWidgetId, screenSize);
-        App.prefs.edit().putInt(getSizeKey(appWidgetId), screenSize.ordinal()).commit();
+        App.prefs.edit().putInt(Pref.getSizeKey(appWidgetId), screenSize.ordinal()).commit();
         updateUI(context, new int[]{appWidgetId}, appWidgetManager);
     }
 
@@ -115,7 +116,7 @@ public class DailyDealWidget extends AppWidgetProvider {
         LayoutBuilder lb = new LayoutBuilder(context);
         for (int id : ids) {
             if (!sSizeMap.containsKey(id)) {
-                int ordinal = App.prefs.getInt(getSizeKey(id), Size.SMALL.ordinal());
+                int ordinal = App.prefs.getInt(Pref.getSizeKey(id), Size.SMALL.ordinal());
                 sSizeMap.put(id, Size.values()[ordinal]);
             }
             RemoteViews views = buildLayout(lb, id);
@@ -138,10 +139,6 @@ public class DailyDealWidget extends AppWidgetProvider {
             default:
                 return null;
         }
-    }
-
-    private static String getSizeKey(int id) {
-        return id + "_size";
     }
 }
 
