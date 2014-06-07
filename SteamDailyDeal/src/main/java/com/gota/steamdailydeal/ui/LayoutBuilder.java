@@ -41,21 +41,24 @@ public class LayoutBuilder {
         ContentResolver cr = mContext.getContentResolver();
         Uri uri = Uri.withAppendedPath(DataProvider.CONTENT_URI, DataProvider.PATH_DAILY_DEAL);
         Cursor cursor = cr.query(uri, Tables.SQL.PROJECTION_DAILY_DEAL_SMALL, null, null, null);
+        try {
+            if (cursor.moveToFirst()) {
+                RemoteViews views = new RemoteViews(mPackageName, R.layout.app_small_size);
+                UIUtils.setupDealView(views, cursor);
 
-        if (cursor.moveToFirst()) {
-            RemoteViews views = new RemoteViews(mPackageName, R.layout.app_small_size);
-            UIUtils.setupDealView(views, cursor);
+                int id = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.ID));
+                int type = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.TYPE));
+                String storeLink = Steam.getStoreLink(type, id);
 
-            int id = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.ID));
-            int type = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.TYPE));
-            String storeLink = Steam.getStoreLink(type, id);
-
-            views.setOnClickPendingIntent(R.id.btn_refresh, createRefreshPendingIntent());
-            views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(storeLink));
-            return views;
-        } else {
-            // TODO: Return empty view
-            return null;
+                views.setOnClickPendingIntent(R.id.btn_refresh, createRefreshPendingIntent());
+                views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(storeLink));
+                return views;
+            } else {
+                // TODO: Return empty view
+                return null;
+            }
+        } finally {
+            cursor.close();
         }
     }
 

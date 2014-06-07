@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class App extends Application {
     public static final String TAG = "MiniSteam";
     public static final int INTERVAL = 24 * 3600 * 1000;
+    public static final boolean DEBUG = false;
 
     public static RequestQueue queue;
     public static ImageLoader imgLoader;

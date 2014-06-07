@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -51,7 +52,8 @@ public class DailyDealWidget extends AppWidgetProvider {
                 LayoutBuilder lb = new LayoutBuilder(context);
                 for (int id : ids) {
                     if (!sSizeMap.containsKey(id)) {
-                        sSizeMap.put(id, Size.SMALL);
+                        int ordinal = App.prefs.getInt(getSizeKey(id), Size.SMALL.ordinal());
+                        sSizeMap.put(id, Size.values()[ordinal]);
                     }
                     RemoteViews views = buildLayout(lb, id);
                     appWidgetManager.updateAppWidget(id, views);
@@ -66,13 +68,6 @@ public class DailyDealWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(App.TAG, "on update: " + Arrays.toString(appWidgetIds));
-        LayoutBuilder lb = new LayoutBuilder(context);
-        for (int appWidgetId : appWidgetIds) {
-            RemoteViews views = lb.buildMediumLayout(appWidgetId);
-            if (views == null) continue;
-
-            appWidgetManager.updateAppWidget(appWidgetId, views);
-        }
     }
 
     @Override
@@ -85,6 +80,12 @@ public class DailyDealWidget extends AppWidgetProvider {
     public void onDeleted(Context context, int[] appWidgetIds) {
         // When the user deletes the widget, delete the preference associated with it.
         Log.d(App.TAG, "on deleted");
+        SharedPreferences.Editor editor = App.prefs.edit();
+        for (int id : appWidgetIds) {
+            sSizeMap.remove(id);
+            editor.remove(getSizeKey(id));
+        }
+        editor.commit();
     }
 
     @Override
@@ -115,8 +116,11 @@ public class DailyDealWidget extends AppWidgetProvider {
             screenSize = Size.LARGE;
         }
         sSizeMap.put(appWidgetId, screenSize);
+        App.prefs.edit()
+            .putInt(getSizeKey(appWidgetId), screenSize.ordinal())
+            .commit();
 
-        Log.d(App.TAG, String.format(
+        if (App.DEBUG) Log.d(App.TAG, String.format(
                 "app_id: %s [minWidth=%s, maxWidth=%s, minHeight=%s, maxHeight=%s]",
                 appWidgetId, minWidth, maxWidth, minHeight, maxHeight));
         Log.d(App.TAG, "screen size: " + screenSize);
@@ -145,6 +149,9 @@ public class DailyDealWidget extends AppWidgetProvider {
         }
     }
 
+    private static String getSizeKey(int id) {
+        return id + "_size";
+    }
 }
 
 
