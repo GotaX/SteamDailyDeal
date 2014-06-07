@@ -1,7 +1,10 @@
 package com.gota.steamdailydeal.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.gota.steamdailydeal.App;
@@ -18,6 +21,12 @@ import java.net.URLConnection;
  * Email: G.tianxiang@gmail.com
  */
 public class NetUtils {
+
+    public static boolean isNetAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) App.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        return info != null && info.isConnected();
+    }
 
     public static void loadImageToCache(String url) {
         if (App.cache.isCached(url)) return;

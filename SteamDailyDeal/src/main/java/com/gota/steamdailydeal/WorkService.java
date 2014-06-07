@@ -66,6 +66,12 @@ public class WorkService extends IntentService {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        completeNotification();
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
