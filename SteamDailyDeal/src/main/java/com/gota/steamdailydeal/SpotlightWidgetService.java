@@ -4,20 +4,15 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
 import com.gota.steamdailydeal.util.MyTextUtils;
-import com.gota.steamdailydeal.util.NetUtils;
-
-import java.util.concurrent.CountDownLatch;
+import com.gota.steamdailydeal.util.UIUtils;
 
 /**
  * Created by Gota on 2014/5/20.
@@ -32,8 +27,6 @@ public class SpotlightWidgetService extends RemoteViewsService {
 
     static class FlipperRemoteViewsFactory implements RemoteViewsFactory {
 
-        private static Bitmap sPicNotFound;
-
         private AppWidgetManager mAppWidgetManager;
         private String mPackageName;
         private int mAppWidgetId;
@@ -43,8 +36,6 @@ public class SpotlightWidgetService extends RemoteViewsService {
         public FlipperRemoteViewsFactory(Context context, Intent intent) {
             this.mContext = context;
             this.mAppWidgetManager = AppWidgetManager.getInstance(context);
-            sPicNotFound = BitmapFactory.decodeResource(
-                    mContext.getResources(), R.drawable.not_found);
             mAppWidgetId = intent.getIntExtra(
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -69,19 +60,6 @@ public class SpotlightWidgetService extends RemoteViewsService {
                     Tables.TDeals.CAT_DAILY_DEAL,
                     Tables.TDeals.CAT_SPOTLIGHT);
             mCursor = mContext.getContentResolver().query(uri, null, where, null, null);
-
-            // Download image and cache it
-            CountDownLatch countDown = new CountDownLatch(mCursor.getCount());
-            while (mCursor.moveToNext()) {
-                String imageUrl = mCursor.getString(
-                        mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
-                NetUtils.loadImageToCache(countDown, imageUrl);
-            }
-            try {
-                countDown.await();
-            } catch (InterruptedException e) {
-                Log.e(App.TAG, "Interrupted when load image to cache!", e);
-            }
         }
 
         @Override
@@ -113,64 +91,28 @@ public class SpotlightWidgetService extends RemoteViewsService {
         }
 
         private RemoteViews setupDailyDealView() {
-            RemoteViews views = new RemoteViews(mPackageName, R.layout.deal_item);
-
             Log.d(App.TAG, "Setup view daily deal");
-            String imgHeader = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
-            String name = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.NAME));
-            int originalPrice = mCursor.getInt(
-                    mCursor.getColumnIndex(Tables.TDeals.ORIGINAL_PRICE));
-            int price = mCursor.getInt(
-                    mCursor.getColumnIndex(Tables.TDeals.FINAL_PRICE));
-            int appId = mCursor.getInt(
-                    mCursor.getColumnIndex(Tables.TDeals.ID));
-            String currency = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.CURRENCY));
-            String discountPercent = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.DISCOUNT_PERCENT));
 
-            CharSequence sOriginalPrice = MyTextUtils.getCurrency(
-                    originalPrice, currency);
-            sOriginalPrice = MyTextUtils.strikethrough(sOriginalPrice);
-            CharSequence sPrice = MyTextUtils.getCurrency(price, currency);
-            CharSequence sDiscountPercent = MyTextUtils.getDiscount(discountPercent);
+            RemoteViews views = new RemoteViews(mPackageName, R.layout.deal_item);
+            UIUtils.setupDealView(views, mCursor);
+
+            int appId = mCursor.getInt(mCursor.getColumnIndex(Tables.TDeals.ID));
             String url = MyTextUtils.getStoreLink(appId);
-
-            NetUtils.loadImageFromCache(views, imgHeader);
-
-            views.setTextViewText(R.id.tv_name, name);
-            views.setTextViewText(R.id.tv_original_price, sOriginalPrice);
-            views.setTextViewText(R.id.tv_price, sPrice);
-            views.setTextViewText(R.id.tv_discount_percent, sDiscountPercent);
 
             Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             views.setOnClickFillInIntent(R.id.img_header, clickIntent);
-
             return views;
         }
 
         private RemoteViews setupSpotLightView() {
             Log.d(App.TAG, "Setup view spotlight");
-            final RemoteViews views = new RemoteViews(mPackageName, R.layout.deal_item);
 
-            String imgHeader = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.HEADER_IMAGE));
-            String name = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.NAME));
-            String body = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.BODY));
-            String url = mCursor.getString(
-                    mCursor.getColumnIndex(Tables.TDeals.URL));
+            RemoteViews views = new RemoteViews(mPackageName, R.layout.deal_item);
+            UIUtils.setupSpotlightView(views, mCursor);
 
-            NetUtils.loadImageFromCache(views, imgHeader);
-            views.setTextViewText(R.id.tv_name, name);
-            views.setViewVisibility(R.id.area_price, View.GONE);
-
+            String url = mCursor.getString(mCursor.getColumnIndex(Tables.TDeals.URL));
             Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             views.setOnClickFillInIntent(R.id.img_header, clickIntent);
-
             return views;
         }
 

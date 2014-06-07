@@ -31,28 +31,35 @@ public class DailyDealWidget extends AppWidgetProvider {
         SMALL, MEDIUM, LARGE
     }
 
-    private Map<Integer, Size> mSizeMap = new HashMap<>();
+    private static Map<Integer, Size> sSizeMap = new HashMap<>();
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.d(App.TAG, "Receive broadcast: " + action);
-        if (ACTION_REFRESH.equals(action)) {
-            WorkService.startActionUpdateData(context);
-            WorkService.startActionWeekLongDeal(context);
-        } else if (ACTION_UPDATE_UI.equals(action)) {
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            ComponentName componentName = new ComponentName(context, DailyDealWidget.class);
-            int[] ids = appWidgetManager.getAppWidgetIds(componentName);
-            LayoutBuilder lb = new LayoutBuilder(context);
-            for (int id : ids) {
-                if (!mSizeMap.containsKey(id)) {
-                    mSizeMap.put(id, Size.SMALL);
+
+        switch (action) {
+            case ACTION_REFRESH:
+                WorkService.startActionUpdateData(context);
+                WorkService.startActionWeekLongDeal(context);
+                break;
+            case ACTION_UPDATE_UI:
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                ComponentName componentName = new ComponentName(context, DailyDealWidget.class);
+                int[] ids = appWidgetManager.getAppWidgetIds(componentName);
+
+                LayoutBuilder lb = new LayoutBuilder(context);
+                for (int id : ids) {
+                    if (!sSizeMap.containsKey(id)) {
+                        sSizeMap.put(id, Size.SMALL);
+                    }
+                    RemoteViews views = buildLayout(lb, id);
+                    appWidgetManager.updateAppWidget(id, views);
                 }
-                buildLayout(lb, id);
-            }
-        } else {
-            super.onReceive(context, intent);
+                break;
+            default:
+                super.onReceive(context, intent);
+                break;
         }
     }
 
@@ -107,7 +114,7 @@ public class DailyDealWidget extends AppWidgetProvider {
         } else {
             screenSize = Size.LARGE;
         }
-        mSizeMap.put(appWidgetId, screenSize);
+        sSizeMap.put(appWidgetId, screenSize);
 
         Log.d(App.TAG, String.format(
                 "app_id: %s [minWidth=%s, maxWidth=%s, minHeight=%s, maxHeight=%s]",
@@ -122,7 +129,7 @@ public class DailyDealWidget extends AppWidgetProvider {
     }
 
     private RemoteViews buildLayout(LayoutBuilder layoutBuilder, int appWidgetId) {
-        Size screenSize = mSizeMap.get(appWidgetId);
+        Size screenSize = sSizeMap.get(appWidgetId);
         Log.d(App.TAG, "Build " + screenSize + " layout!");
         if (screenSize == null) {
             return null;
