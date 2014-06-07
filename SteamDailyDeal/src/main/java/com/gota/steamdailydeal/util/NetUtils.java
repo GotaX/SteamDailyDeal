@@ -8,6 +8,8 @@ import android.widget.RemoteViews;
 import com.gota.steamdailydeal.App;
 import com.gota.steamdailydeal.R;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,6 +28,25 @@ public class NetUtils {
             views.setImageViewResource(R.id.img_header, R.drawable.not_found);
         } else {
             views.setImageViewBitmap(R.id.img_header, bitmap);
+        }
+    }
+
+    public static void loadImageToCache(String url) {
+        if (App.cache.isCached(url)) return;
+
+        InputStream in = null;
+        try {
+            Log.d(App.TAG, "Start download image: " + url);
+            URLConnection connection = new URL(url).openConnection();
+            in = connection.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(in);
+
+            Log.d(App.TAG, "Add image to cache!" + url);
+            App.cache.putBitmap(url, bitmap);
+        } catch (IOException e) {
+            Log.e(App.TAG, "Error on download image!", e);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
     }
 

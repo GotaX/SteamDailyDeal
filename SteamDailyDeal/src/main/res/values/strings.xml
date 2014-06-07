@@ -13,5 +13,13 @@
     <string name="title_activity_test">TestActivity</string>
     <string name="btn_test">Test</string>
     <string name="loading">Loading...</string>
+    <string name="notification_title_daily_deal_and_spot_light">Daily Deal</string>
+    <string name="notification_content_request_data">正在请求数据</string>
+    <string name="notification_content_parse_data">正在解析数据</string>
+    <string name="notification_content_store_data">正在保存数据</string>
+    <string name="notification_content_cache_images">正在下载图片</string>
+    <string name="notification_content_fail_parse_data">数据解析失败!</string>
+    <string name="notification_content_fail_request_data">数据获取失败!</string>
+    <string name="notification_title_week_long_deals">Week long deals</string>
 
 </resources>
