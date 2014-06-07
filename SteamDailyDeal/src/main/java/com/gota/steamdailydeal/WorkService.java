@@ -33,6 +33,7 @@ public class WorkService extends IntentService {
     private static final String ACTION_WEEK_LONG_DEAL =
             "com.gota.steamdailydeal.action.grab_data_week_long_deal";
 
+    private static final boolean DEBUG = false;
     private static final int NOTIFICATION_ID = 0x26;
 
     private NotificationCompat.Builder mBuilder;
@@ -92,7 +93,8 @@ public class WorkService extends IntentService {
         try {
             // Receive data
             String json = future.get();
-            Log.d(App.TAG, "Receive JSON string:\n" + json);
+            Log.d(App.TAG, "Receive JSON string:");
+            if (DEBUG) Log.d(App.TAG, json);
 
             // Parse JSON data
             fireNotification(getString(R.string.notification_content_parse_data));
@@ -133,7 +135,8 @@ public class WorkService extends IntentService {
         try {
             // Start request data
             Document doc = Jsoup.connect(Steam.WEEK_LONG_DEAL).get();
-            Log.d(App.TAG, "Receive HTML Document:\n" + doc.html());
+            Log.d(App.TAG, "Receive HTML Document:");
+            if (DEBUG) Log.d(App.TAG, doc.html());
 
             // Parse HTML data
             fireNotification(getString(R.string.notification_content_parse_data));
