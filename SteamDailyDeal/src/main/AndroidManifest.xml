@@ -46,6 +46,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.DetailDialogActivity"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar"
+            android:label="@string/title_activity_detail_dialog" >
+        </activity>
+
+        <!--
+        <activity
             android:name=".activity.TestActivity"
             android:label="@string/title_activity_test" >
             <intent-filter>
@@ -54,11 +61,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.DetailDialogActivity"
-            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar"
-            android:label="@string/title_activity_detail_dialog" >
-        </activity>
+        -->
     </application>
 
 </manifest>
