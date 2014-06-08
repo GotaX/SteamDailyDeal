@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:autoStart="true"
-        android:flipInterval="3000" />
+        android:flipInterval="7000" />
 
     <ImageButton
         android:id="@+id/btn_refresh"
