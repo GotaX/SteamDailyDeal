@@ -8,9 +8,9 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.gota.steamdailydeal.activity.DetailDialogActivity;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
-import com.gota.steamdailydeal.util.MyTextUtils;
 import com.gota.steamdailydeal.util.UIUtils;
 
 /**
@@ -71,9 +71,13 @@ public class WeekLongDealsWidgetService extends RemoteViewsService {
             RemoteViews views = new RemoteViews(mPackageName, R.layout.week_long_deal_item);
             UIUtils.setupDealView(views, mCursor);
 
+            int type = mCursor.getInt(mCursor.getColumnIndex(Tables.TDeals.TYPE));
             int appId = mCursor.getInt(mCursor.getColumnIndex(Tables.TDeals.ID));
-            String url = MyTextUtils.getStoreLink(appId);
-            Intent clickIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            String name = mCursor.getString(mCursor.getColumnIndex(Tables.TDeals.NAME));
+            Intent clickIntent = new Intent();
+            clickIntent.putExtra(DetailDialogActivity.KEY_APP_TYPE, type);
+            clickIntent.putExtra(DetailDialogActivity.KEY_APP_ID, appId);
+            clickIntent.putExtra(DetailDialogActivity.KEY_APP_NAME, name);
             views.setOnClickFillInIntent(R.id.ll_deal_item, clickIntent);
             return views;
         }

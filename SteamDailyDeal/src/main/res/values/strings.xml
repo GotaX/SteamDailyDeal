@@ -21,5 +21,9 @@
     <string name="notification_content_fail_parse_data">数据解析失败!</string>
     <string name="notification_content_fail_request_data">数据获取失败!</string>
     <string name="notification_title_week_long_deals">Week long deals</string>
+    <string name="title_activity_detail_dialog">DetailDialogActivity</string>
+    <string name="current_lowest_prise">最低价格</string>
+    <string name="history_lowest_price">历史最低</string>
+    <string name="bundles_count">进包次数</string>
 
 </resources>

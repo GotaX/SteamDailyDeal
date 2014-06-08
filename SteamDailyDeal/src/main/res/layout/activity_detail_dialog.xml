@@ -1,0 +1,96 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_title"
+    android:padding="3dp"
+    tools:context=".activity.DetailDialogActivity">
+
+    <TextView
+        style="@style/MarqueeText"
+        android:id="@+id/tv_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="30sp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:background="@color/bg_main"
+        android:text="AaaaaAAaaaAAAaaAAAAaAAAAA!!! for the Awesome">
+        <requestFocus
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:duplicateParentState="true"/>
+    </TextView>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ProgressBar
+                style="@android:style/Widget.ProgressBar.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:orientation="vertical">
+            <TextView
+                style="@style/LowPriceTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/current_lowest_prise"/>
+
+            <TextView
+                style="@style/LowPriceContent"
+                android:id="@+id/tv_current_lowest_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$2.49 at Steam"/>
+
+            <TextView
+                style="@style/LowPriceTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/history_lowest_price"/>
+
+            <TextView
+                style="@style/LowPriceContent"
+                android:id="@+id/tv_history_lowest_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$2.29 at Steam xxx days ago"/>
+
+            <TextView
+                style="@style/LowPriceTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bundles_count"/>
+
+            <TextView
+                style="@style/LowPriceContent"
+                android:id="@+id/tv_bundle_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1次"/>
+
+            <ImageView
+                android:id="@+id/btn_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/home"/>
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

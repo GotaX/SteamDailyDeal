@@ -13,6 +13,7 @@ import com.gota.steamdailydeal.DailyDealWidget;
 import com.gota.steamdailydeal.R;
 import com.gota.steamdailydeal.SpotlightWidgetService;
 import com.gota.steamdailydeal.WeekLongDealsWidgetService;
+import com.gota.steamdailydeal.activity.DetailDialogActivity;
 import com.gota.steamdailydeal.constants.Steam;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
@@ -116,7 +117,7 @@ public class LayoutBuilder {
         views.setEmptyView(R.id.lv_week_long_deals, R.id.empty);
 
         // Init onclick item
-        Intent ivf = new Intent(Intent.ACTION_VIEW);
+        Intent ivf = new Intent(mContext, DetailDialogActivity.class);
         PendingIntent pi = PendingIntent.getActivity(
                 mContext, 1, ivf, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.lv_week_long_deals, pi);

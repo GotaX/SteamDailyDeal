@@ -12,21 +12,14 @@
         android:src="@drawable/loading"/>
 
     <TextView
+        style="@style/MarqueeText"
         android:id="@+id/tv_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"
         android:textSize="20sp"
         android:textColor="@android:color/primary_text_dark"
         android:background="@color/bg_tv_name"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:scrollHorizontally="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:duplicateParentState="true">
+        android:textStyle="bold">
         <requestFocus
             android:focusable="true"
             android:focusableInTouchMode="true"
