@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -62,6 +63,8 @@ public class DetailDialogActivity extends Activity {
         btnHome = (ImageView) findViewById(R.id.btn_home);
 
         tvName.setText(mAppName);
+        tvCurrentLowestPrice.setMovementMethod(LinkMovementMethod.getInstance());
+        tvHistoryLowestPrice.setMovementMethod(LinkMovementMethod.getInstance());
 
         requestData();
     }
