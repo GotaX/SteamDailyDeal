@@ -1,5 +1,6 @@
 package com.gota.steamdailydeal;
 
+import android.app.NotificationManager;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -84,6 +85,9 @@ public class DailyDealWidget extends AppWidgetProvider {
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
         Log.d(App.TAG, "on disabled");
+        NotificationManager manager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(WorkService.NOTIFICATION_ID);
         App.queue.stop();
         App.instance.cancelAlarm();
         App.prefs.edit().clear().commit();

@@ -106,7 +106,6 @@ public class LayoutBuilder {
             views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(id, type, name));
         }
 
-
         // Setup list
         Intent intent = new Intent(mContext, WeekLongDealsWidgetService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -138,6 +137,6 @@ public class LayoutBuilder {
                 new Intent(mContext, DetailDialogActivity.class),
                 id, type, name);
         return PendingIntent.getActivity(
-                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mContext, 10, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

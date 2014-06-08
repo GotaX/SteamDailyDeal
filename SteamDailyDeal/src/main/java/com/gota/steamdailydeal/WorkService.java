@@ -28,12 +28,13 @@ import java.util.concurrent.ExecutionException;
 
 public class WorkService extends IntentService {
 
+    public static final int NOTIFICATION_ID = 0x26;
+
     private static final String ACTION_UPDATE_DAILY_DEAL_AND_SPOTLIGHT =
             "com.gota.steamdailydeal.action.update_daily_deal_and_spotlight";
     private static final String ACTION_WEEK_LONG_DEAL =
             "com.gota.steamdailydeal.action.update_week_long_deal";
 
-    private static final int NOTIFICATION_ID = 0x26;
     private static int sTaskCount = 0;
 
     private NotificationCompat.Builder mBuilder;
