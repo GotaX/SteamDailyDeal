@@ -28,16 +28,20 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/MarqueeText"
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="150dp"
             android:layout_marginBottom="5dp"
-            android:singleLine="true"
-            android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
-            android:text="FOREST"
-            />
+            android:text="FOREST">
+            <requestFocus
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:duplicateParentState="true"/>
+        </TextView>
 
         <LinearLayout
             android:layout_width="wrap_content"

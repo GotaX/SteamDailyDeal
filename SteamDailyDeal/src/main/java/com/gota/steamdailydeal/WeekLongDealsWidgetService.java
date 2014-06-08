@@ -74,10 +74,9 @@ public class WeekLongDealsWidgetService extends RemoteViewsService {
             int type = mCursor.getInt(mCursor.getColumnIndex(Tables.TDeals.TYPE));
             int appId = mCursor.getInt(mCursor.getColumnIndex(Tables.TDeals.ID));
             String name = mCursor.getString(mCursor.getColumnIndex(Tables.TDeals.NAME));
-            Intent clickIntent = new Intent();
-            clickIntent.putExtra(DetailDialogActivity.KEY_APP_TYPE, type);
-            clickIntent.putExtra(DetailDialogActivity.KEY_APP_ID, appId);
-            clickIntent.putExtra(DetailDialogActivity.KEY_APP_NAME, name);
+
+            Intent clickIntent = DetailDialogActivity.wrapIntent(
+                    new Intent(), appId, type, name);
             views.setOnClickFillInIntent(R.id.ll_deal_item, clickIntent);
             return views;
         }

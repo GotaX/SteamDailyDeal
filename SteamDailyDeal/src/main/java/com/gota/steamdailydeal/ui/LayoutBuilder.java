@@ -14,7 +14,6 @@ import com.gota.steamdailydeal.R;
 import com.gota.steamdailydeal.SpotlightWidgetService;
 import com.gota.steamdailydeal.WeekLongDealsWidgetService;
 import com.gota.steamdailydeal.activity.DetailDialogActivity;
-import com.gota.steamdailydeal.constants.Steam;
 import com.gota.steamdailydeal.data.DataProvider;
 import com.gota.steamdailydeal.data.Tables;
 import com.gota.steamdailydeal.util.UIUtils;
@@ -46,10 +45,10 @@ public class LayoutBuilder {
 
                 int id = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.ID));
                 int type = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.TYPE));
-                String storeLink = Steam.getStoreLink(type, id);
+                String name = cursor.getString(cursor.getColumnIndex(Tables.TDeals.NAME));
 
                 views.setOnClickPendingIntent(R.id.btn_refresh, createRefreshPendingIntent());
-                views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(storeLink));
+                views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(id, type, name));
                 return views;
             } else {
                 // TODO: Return empty view
@@ -101,10 +100,10 @@ public class LayoutBuilder {
 
             int id = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.ID));
             int type = cursor.getInt(cursor.getColumnIndex(Tables.TDeals.TYPE));
-            String storeLink = Steam.getStoreLink(type, id);
+            String name = cursor.getString(cursor.getColumnIndex(Tables.TDeals.NAME));
 
             views.setOnClickPendingIntent(R.id.btn_refresh, createRefreshPendingIntent());
-            views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(storeLink));
+            views.setOnClickPendingIntent(R.id.img_header, createHeaderImagePendingIntent(id, type, name));
         }
 
 
@@ -134,10 +133,11 @@ public class LayoutBuilder {
                 mContext, 0, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private PendingIntent createHeaderImagePendingIntent(String url) {
-        Intent ivf = new Intent(Intent.ACTION_VIEW);
-        ivf.setData(Uri.parse(url));
+    private PendingIntent createHeaderImagePendingIntent(int id, int type, String name) {
+        Intent intent = DetailDialogActivity.wrapIntent(
+                new Intent(mContext, DetailDialogActivity.class),
+                id, type, name);
         return PendingIntent.getActivity(
-                mContext, 0, ivf, PendingIntent.FLAG_UPDATE_CURRENT);
+                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

@@ -24,6 +24,8 @@ import com.gota.steamdailydeal.constants.SteamAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.CountDownLatch;
+
 public class DetailDialogActivity extends Activity {
 
     public static final String KEY_APP_ID = "app_id";
@@ -32,16 +34,28 @@ public class DetailDialogActivity extends Activity {
 
     private int mAppType;
     private int mAppId;
-    private String mAppName;
+
+    private CountDownLatch mLatch;
 
     View vEmpty;
     View vContent;
+    View vPlaying;
 
     TextView tvName;
     TextView tvCurrentLowestPrice;
     TextView tvHistoryLowestPrice;
     TextView tvBundleCount;
+    TextView tvCurrent;
+    TextView tvPeakToday;
+    TextView tvPeakAll;
     ImageView btnHome;
+
+    public static Intent wrapIntent(Intent intent, int appId, int appType, String appName) {
+        intent.putExtra(KEY_APP_ID, appId);
+        intent.putExtra(KEY_APP_TYPE, appType);
+        intent.putExtra(KEY_APP_NAME, appName);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,54 +63,77 @@ public class DetailDialogActivity extends Activity {
         setContentView(R.layout.activity_detail_dialog);
 
         Intent intent = getIntent();
-        mAppId = intent.getIntExtra(KEY_APP_ID, 0);
-        mAppType = intent.getIntExtra(KEY_APP_TYPE, 0);
-        mAppName = intent.getStringExtra(KEY_APP_NAME);
+        this.mAppId = intent.getIntExtra(KEY_APP_ID, 0);
+        this.mAppType = intent.getIntExtra(KEY_APP_TYPE, 0);
+        String appName = intent.getStringExtra(KEY_APP_NAME);
+
         Log.d(App.TAG, "id=" + mAppId + ", type=" + mAppType);
 
         vEmpty = findViewById(android.R.id.empty);
         vContent = findViewById(R.id.content);
+        vPlaying = findViewById(R.id.v_playing);
+
         tvName = (TextView) findViewById(R.id.tv_name);
         tvCurrentLowestPrice = (TextView) findViewById(R.id.tv_current_lowest_price);
         tvHistoryLowestPrice = (TextView) findViewById(R.id.tv_history_lowest_price);
         tvBundleCount = (TextView) findViewById(R.id.tv_bundle_count);
+
+        tvCurrent = (TextView) findViewById(R.id.tv_current);
+        tvPeakToday = (TextView) findViewById(R.id.tv_peak_tody);
+        tvPeakAll = (TextView) findViewById(R.id.tv_peak_all);
+
         btnHome = (ImageView) findViewById(R.id.btn_home);
 
-        tvName.setText(mAppName);
+        // Setup basic UI
+        tvName.setText(appName);
+
+        // Make HTML TextView can be clicked
         tvCurrentLowestPrice.setMovementMethod(LinkMovementMethod.getInstance());
         tvHistoryLowestPrice.setMovementMethod(LinkMovementMethod.getInstance());
 
+        // Show playing data if it`s a app
+        if (mAppType == Steam.TYPE_APP) {
+            mLatch = new CountDownLatch(2);
+            requestPlayingData();
+        } else {
+            mLatch = new CountDownLatch(1);
+            vPlaying.setVisibility(View.GONE);
+        }
         requestData();
+
+        // Waiting for update UI
+        waitRequestComplete();
     }
 
     private void requestData() {
         Log.d(App.TAG, "Start request JSON");
         String query = String.format(SteamAPI.LOWEST_PRICE, Steam.getTypeStr(mAppType), mAppId);
         App.queue.add(new JsonObjectRequest(
-            Request.Method.GET,
-            query, null,
+            Request.Method.GET, query, null,
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d(App.TAG, "Response: " + response);
                     try {
-                        processJSON(response);
+                        processLowestPriceJSON(response);
                     } catch (JSONException e) {
+                        Log.e(App.TAG, "Error on parse json!", e);
                         Toast.makeText(DetailDialogActivity.this, R.string.notification_content_fail_parse_data, Toast.LENGTH_LONG).show();
+                    } finally {
+                        mLatch.countDown();
                     }
-                    completeRequest();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e(App.TAG, "Error on reqeust lowest price!", error);
                     Toast.makeText(DetailDialogActivity.this, R.string.notification_content_fail_request_data, Toast.LENGTH_LONG).show();
-                    completeRequest();
+                    mLatch.countDown();
                 }
             }));
     }
 
-    private void processJSON(JSONObject json) throws JSONException {
+    private void processLowestPriceJSON(JSONObject json) throws JSONException {
         // Parse JSON data
         JSONObject objPrice = json.getJSONObject("price");
         String priceStore = objPrice.getString("store");
@@ -137,8 +174,59 @@ public class DetailDialogActivity extends Activity {
         });
     }
 
-    private void completeRequest() {
-        vEmpty.setVisibility(View.GONE);
-        vContent.setVisibility(View.VISIBLE);
+    private void requestPlayingData() {
+        String query = String.format(SteamAPI.PLAYING_CHART, mAppId);
+        App.queue.add(new JsonObjectRequest(
+                Request.Method.GET, query, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            processPlayingDataJSON(response);
+                        } catch (JSONException e) {
+                            Log.e(App.TAG, "Error on parse json!", e);
+                            Toast.makeText(DetailDialogActivity.this, R.string.notification_content_fail_parse_data, Toast.LENGTH_LONG).show();
+                        } finally {
+                            mLatch.countDown();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(App.TAG, "Error on reqeust playing data!", error);
+                        Toast.makeText(DetailDialogActivity.this, R.string.notification_content_fail_request_data, Toast.LENGTH_LONG).show();
+                        mLatch.countDown();
+                    }
+                }
+        ));
+    }
+
+    private void processPlayingDataJSON(JSONObject json) throws JSONException {
+        JSONObject objChart = json.getJSONObject("chart");
+        String current = objChart.getString("current");
+        String peakToday = objChart.getString("peaktoday");
+        String peakAll = objChart.getString("peakall");
+
+        tvCurrent.setText(current);
+        tvPeakToday.setText(peakToday);
+        tvPeakAll.setText(peakAll);
+    }
+
+    private void waitRequestComplete() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mLatch.await();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            vEmpty.setVisibility(View.GONE);
+                            vContent.setVisibility(View.VISIBLE);
+                        }
+                    });
+                } catch (InterruptedException e) { }
+            }
+        }).start();
     }
 }

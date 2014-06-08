@@ -23,5 +23,5 @@ public interface SteamAPI {
 
     // Enhanced Steam
     String LOWEST_PRICE = "http://api.enhancedsteam.com/pricev2/?search=%s/%s&stores=steam,amazonus,impulse,gamersgate,greenmangaming,gamefly,origin,uplay,indiegalastore,gametap,gamesplanet,getgames,desura,gog,dotemu,gameolith,adventureshop,nuuvem,shinyloot,dlgamer,humblestore,squenix,bundlestars,fireflower,humblewidgets&cc=US&coupon=true";
-
+    String PLAYING_CHART = "http://api.enhancedsteam.com/charts/?appid=%s";
 }
