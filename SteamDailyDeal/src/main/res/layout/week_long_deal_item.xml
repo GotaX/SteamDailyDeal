@@ -3,9 +3,12 @@
     android:id="@+id/ll_deal_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="15dp"
+    android:paddingTop="15dp"
     android:gravity="center_vertical"
-    android:background="@color/bg_main"
+    android:background="@drawable/bg_main"
     android:orientation="horizontal">
 
     <ImageView
@@ -15,7 +18,7 @@
         android:scaleType="centerCrop"
         android:layout_weight="9"
         android:padding="3dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/bg_header_img"
         android:src="@drawable/demo_small_pic"/>
 
